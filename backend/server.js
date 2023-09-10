@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const http = require('http');
 const app = express();
+app.use(express.json());
 
 
 const  connectDatabase =  require('./Database/databaseConnecion');
@@ -15,14 +16,13 @@ connectDatabase()
 
 
 
+// import all routes
+const userRoutes = require('./routes/userRoutes');
 
-// routes
-app.get("/", function(req, res) {
-    res.status(200).json({
-        success:true,
-        message:"Wecome to Chat Application"
-    })
-})
+
+// user routes
+app.use("/api/v1", userRoutes)
+
 
 
 
