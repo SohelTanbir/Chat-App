@@ -1,9 +1,21 @@
 const User = require('../models/userModel');
+const bcrypt = require('bcrypt');
 
 
 // create a new user
 const createUser = async (req, res)=>{
-    const newUser  = await User.create(req.body);
+    const {username, email, password} = req.body;
+    if(!username && !email && !password){
+        return;
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hasPassword = await bcrypt.hash(password, salt);
+    const userData = {
+        username, 
+        email, 
+        password:hasPassword
+    }
+    const newUser  = await User.create(userData);
     try {
        const result = await  newUser.save();
         if(!result){
