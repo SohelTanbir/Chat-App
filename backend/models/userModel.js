@@ -21,7 +21,7 @@ const userSchema =  mongoose.Schema({
         type:String,
         required:true,
         enum:["admin", "user"],
-        default:"user"
+        default:"user",
     },
     createdAt:{
         type: Date,
