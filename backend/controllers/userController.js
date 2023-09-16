@@ -1,14 +1,15 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 
 // create a new user
 const createUser = async (req, res)=>{
-    const {username, email, password, role} = req.body;
-    if(!username || !email || !password){
+    const {name, email, password, role} = req.body;
+    if(!name || !email || !password){
         res.status(201).json({
             success:false,
-            message:'Username, email and password are required',
+            message:'Name, email and password are required',
         });
         return;
     }
@@ -27,7 +28,7 @@ const createUser = async (req, res)=>{
     const salt = await bcrypt.genSalt(10);
     const hasPassword = await bcrypt.hash(password, salt);
     const userData = {
-        username, 
+        name, 
         email, 
         role,
         password:hasPassword
@@ -55,10 +56,66 @@ const createUser = async (req, res)=>{
     }
 }
 
+// Login user
+const LoginUser = async (req, res) => {
+    const {email, password} = req.body;
+
+    if(!email || !password){
+        res.status(201).json({
+            success:false,
+            message:'Email and password are required',
+        });
+        return;
+    }
+
+    try {
+        // check already exists user with this email address
+    const user = await User.find({email});
+    if(!user.length > 0) {
+        return res.status(201).json({
+            success:false,
+            message:"User not found!",
+        });
+    }
+    // check  password is correct or not
+    const isPasswordsCorrect =  await bcrypt.compare(password, user[0].password);
+    if(!isPasswordsCorrect){
+       return res.status(201).json({
+            success:false,
+            message:"Email or password incorrect!",
+        });
+    }
+    // generate auth token
+    const token = jwt.sign({email,userId:user[0]._id}, process.env.JWT_SECREAT,{ expiresIn: '1h' });
+    res.status(201).json({
+        success:true,
+        message:"Login success",
+        token,
+        user:{
+            userId: user[0]._id,
+          name: user[0].name,
+          email
+        }
+    });
+
+    } catch (err) {
+        res.status(201).json({
+            success:false,
+            error:err.message,
+        });
+    }
+
+
+
+
+
+}
+
 
 
 
 // export controllers
 module.exports = {
-    createUser
+    createUser,
+    LoginUser
 }
