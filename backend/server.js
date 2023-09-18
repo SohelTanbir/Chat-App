@@ -19,13 +19,17 @@ connectDatabase()
 // import all routes
 const userRoutes = require('./routes/userRoutes');
 const chatRoute = require('./routes/chatRoute');
+const messageRoute = require('./routes/messageRoute');
 
 
 // user routes
 app.use("/api/v1", userRoutes);
+
 // chat routes
 app.use("/api/v1", chatRoute);
 
+// message routes
+app.use("/api/v1", messageRoute );
 
 
 
