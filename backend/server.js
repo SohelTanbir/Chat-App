@@ -39,9 +39,12 @@ app.use("/api/v1", messageRoute );
 // default Error Handler
 const errorHandler  = (err, req, res, next)=>{
     if(req.headersSent){
-         return next(err)
+         return next(err.message);
     }
-    res.status(500).json({error:err})
+    res.status(500).json({
+        success:false,
+        message:err
+    })
  }
 
  app.use(errorHandler);

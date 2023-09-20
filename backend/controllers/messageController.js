@@ -3,6 +3,8 @@ const MessageModel = require('../models/messageModel');
 
 // add a new message
 const createMessage = async (req, res)=>{
+    console.log("createMessage")
+
     const {chatId, senderId, message } =  req.body;
     if(!chatId || ! senderId || ! message){
         return res.status(201).json({
@@ -46,10 +48,11 @@ const getUsersMessages = async (req, res)=>{
 
    try {
     const messages = await MessageModel.find({chatId});
+    console.log("messages", messages)
     if(!messages){
         return res.status(500).json({
               success:false,
-              message:'There was an no message found!',
+              message:'There was no message found!',
           });
       }
           res.status(200).json({
