@@ -8,8 +8,9 @@ const Login = () => {
     return (
         <div id='auth-page'>
             <div className="flex">
-                <div className="max-w-[450px] w-full mx-auto px-5 py-8 text-center h-screen flex items-center justify-center">
+                <div className="max-w-[450px] w-full mx-auto px-5 py-8 text-center h-screen flex items-center justify-center ">
                     <div className='w-full'>
+                    <h2 className=' font-Montserrat font-semibold  text-md text-primary mb-2 min-[780px]:hidden '>Welcome Back!</h2>
                     <h2 className=' font-Montserrat font-bold text-3xl mb-5'>Sign In</h2>
                     <div className="tex-center">
                         <ul className='flex justify-center items-center '>
@@ -33,9 +34,10 @@ const Login = () => {
                             <p>Forgot your password?</p>
                         </Link>
                     <button className=' font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2'>Sign in</button>
+                    <p className=' font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden'>Don't have an account? <Link to="/"> <span className='underline'>Sign Up</span> </Link></p>
                     </div>
                 </div>
-                <div className="w-96 bg-primary px-5 py-8 text-center flex justify-center items-center">
+                <div className="w-96 bg-primary px-5 py-8 text-center flex justify-center items-center max-[780px]:hidden">
                     <div className="w-full">
                     <h2 className=' font-Montserrat font-semibold  text-2xl text-white mb-3'>Welcome Back!</h2>
                     <p className=' font-Montserrat font-normal  text-lg text-white mb-4' >Enter your credentials and start<br />
@@ -43,6 +45,7 @@ const Login = () => {
                     </p>
                   <Link to="/">
                      <button className=' font-medium text-white text-center border border-gray-300 rounded-full  uppercase py-2 px-8  hover:bg-primary hover:border-current  '>Sign Up</button>
+
                   </Link>
                 </div>
                 </div>
