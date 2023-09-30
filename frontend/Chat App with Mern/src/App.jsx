@@ -1,12 +1,19 @@
-import './App.css'
-import Auth from './pages/Auth';
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 import './tailwind/style.css';
+import NotFound from './pages/NotFound';
 
 function App() {
 
   return (
     <>
-        <Auth/>
+      <Routes>
+          <Route path='/' element={<SignUp/>} />
+          <Route path='/login' element={<Login/>} />
+          <Route path='*' element={<NotFound/>} />
+      </Routes>
       </>
   )
 }
