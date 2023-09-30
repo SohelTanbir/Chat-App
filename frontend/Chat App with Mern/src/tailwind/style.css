@@ -575,6 +575,10 @@ video {
   margin-bottom: 5x;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .block {
   display: block;
 }
@@ -822,6 +826,11 @@ video {
 @media (min-width: 768px) {
   .md\:hidden {
     display: none;
+  }
+
+  .md\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 }
 
