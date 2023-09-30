@@ -1,10 +1,47 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import {useNavigate } from 'react-router-dom';
 
 
 
 const SignUp = () => {
+    const navigate = useNavigate();
+    const [user, setUser] =  useState({
+        name:"",
+        email:"",
+        password:"",
+    });
+
+// get input field value
+const handleChange =(e)=>{
+    const newUser  = {...user};
+    newUser[e.target.name] = e.target.value;
+    setUser(newUser);
+}
+
+// submit the form and create account
+const handleSumit = (e)=>{
+    e.preventDefault();
+    if(!user.name || !user.email || !user.password){
+        alert("All field are required!");
+        return;
+    }
+    setUser({
+        name:"",
+        email:"",
+        password:"",
+    });
+    alert("Account created successfully!");
+    // redirect to login page
+   setTimeout(()=>{
+    navigate("/login");
+   }, 1000);
+}
+
+
+
     return (
         <div id='auth-page'>
             <div className="flex">
@@ -37,12 +74,12 @@ const SignUp = () => {
                         </ul>
                     </div>
                     <p className=' font-normal text-black text-center texy-sm py-3'>Or use your email for registration</p>
-                    <form>
-                       <input className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="text"  placeholder='Name'/> <br />
-                       <input className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="email"  placeholder='Email'/><br />
-                       <input className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="password"  placeholder='Password'/>
-                    </form>
+                    <form onSubmit={handleSumit}>
+                       <input onChange={handleChange} className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="text" name="name" placeholder='Name' value={user.name}/> <br />
+                       <input onChange={handleChange} className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="email" name="email" placeholder='Email' value={user.email}/><br />
+                       <input onChange={handleChange} className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="password" name="password" placeholder='Password' value={user.password}/>
                     <button className=' font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2'>Sign Up</button>
+                    </form>
                     <p className=' font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden'>Already have an account? <Link to="/login"> <span className='underline'>Sign In</span> </Link></p>
                     </div>
                 </div>

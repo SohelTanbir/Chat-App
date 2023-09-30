@@ -1,10 +1,52 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import { Link } from 'react-router-dom';
-
+import { useState } from 'react';
+import {useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
+    const navigate = useNavigate();
+    const [user, setUser] =  useState({
+        email:"",
+        password:"",
+    });
+
+// get input field value
+const handleChange =(e)=>{
+    const newUser  = {...user};
+    newUser[e.target.name] = e.target.value;
+    setUser(newUser);
+}
+
+// submit the form and create account
+const handleSumit = (e)=>{
+    e.preventDefault();
+    if(!user.email || !user.password){
+        alert("All field are required!");
+        return;
+    }
+    setUser({
+        email:"",
+        password:"",
+    });
+
+    alert("Login Success");
+    // redirect to
+//    setTimeout(()=>{
+//     navigate("/login");
+//    }, 1000);
+}
+
+
+
+
+
+
+
+
+
+
     return (
         <div id='auth-page'>
             <div className="flex">
@@ -26,14 +68,14 @@ const Login = () => {
                         </ul>
                     </div>
                     <p className=' font-normal text-black text-center texy-sm py-3'>Or use your Account</p>
-                    <form>
-                       <input className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="email"  placeholder='Email'/><br />
-                       <input className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="password"  placeholder='Password'/>
-                    </form>
+                    <form onSubmit={handleSumit}>
+                       <input onChange={handleChange} name="email" className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="email"  placeholder='Email'/><br />
+                       <input onChange={handleChange} name="password" className='w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none ' type="password"  placeholder='Password'/>
                         <Link to="/password/forgot">
                             <p>Forgot your password?</p>
                         </Link>
                     <button className=' font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2'>Sign in</button>
+                    </form>
                     <p className=' font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden'>Don't have an account? <Link to="/"> <span className='underline'>Sign Up</span> </Link></p>
                     </div>
                 </div>

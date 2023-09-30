@@ -539,6 +539,10 @@ video {
   margin-right: auto;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-3 {
   margin-bottom: 0.75rem;
 }
@@ -567,28 +571,12 @@ video {
   margin-top: 0.75rem;
 }
 
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-
-.mb-\[5x\] {
-  margin-bottom: 5x;
-}
-
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-
 .block {
   display: block;
 }
 
 .flex {
   display: flex;
-}
-
-.hidden {
-  display: none;
 }
 
 .h-10 {
@@ -603,24 +591,20 @@ video {
   width: 2.5rem;
 }
 
-.w-full {
-  width: 100%;
-}
-
 .w-96 {
   width: 24rem;
 }
 
-.w-\[400px\] {
-  width: 400px;
-}
-
-.max-w-\[450px\] {
-  max-width: 450px;
+.w-full {
+  width: 100%;
 }
 
 .max-w-\[400px\] {
   max-width: 400px;
+}
+
+.max-w-\[450px\] {
+  max-width: 450px;
 }
 
 .cursor-pointer {
@@ -662,9 +646,9 @@ video {
   background-color: rgb(254 72 61 / var(--tw-bg-opacity));
 }
 
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .px-5 {
@@ -675,6 +659,11 @@ video {
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .py-2 {
@@ -692,26 +681,6 @@ video {
   padding-bottom: 2rem;
 }
 
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.py-\[10px\] {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.py-\[14px\] {
-  padding-top: 14px;
-  padding-bottom: 14px;
-}
-
 .text-center {
   text-align: center;
 }
@@ -726,26 +695,6 @@ video {
   line-height: 2.25rem;
 }
 
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-}
-
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
-}
-
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-}
-
 .text-6xl {
   font-size: 3.75rem;
   line-height: 1;
@@ -755,8 +704,9 @@ video {
   font-size: 12px;
 }
 
-.text-\[10px\] {
-  font-size: 10px;
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .font-bold {
@@ -824,10 +774,6 @@ video {
 }
 
 @media (min-width: 768px) {
-  .md\:hidden {
-    display: none;
-  }
-
   .md\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -836,12 +782,6 @@ video {
 
 @media (min-width: 780px) {
   .min-\[780px\]\:hidden {
-    display: none;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:hidden {
     display: none;
   }
 }
