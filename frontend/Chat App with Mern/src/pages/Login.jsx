@@ -22,20 +22,18 @@ const handleChange =(e)=>{
 // submit the form and create account
 const handleSumit = (e)=>{
     e.preventDefault();
-    if(!user.email || !user.password){
-        alert("All field are required!");
-        return;
-    }
+    // if(!user.email || !user.password){
+    //     alert("All field are required!");
+    //     return;
+    // }
     setUser({
         email:"",
         password:"",
     });
 
-    alert("Login Success");
-    // redirect to
-//    setTimeout(()=>{
-//     navigate("/login");
-//    }, 1000);
+
+   // redirect to all chats list pages
+   navigate("/chats");
 }
 
 
@@ -76,7 +74,7 @@ const handleSumit = (e)=>{
                         </Link>
                     <button className=' font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2'>Sign in</button>
                     </form>
-                    <p className=' font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden'>Don't have an account? <Link to="/"> <span className='underline'>Sign Up</span> </Link></p>
+                    <p className=' font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden'>Dont have an account? <Link to="/"> <span className='underline'>Sign Up</span> </Link></p>
                     </div>
                 </div>
                 <div className="w-96 bg-primary px-5 py-8 text-center flex justify-center items-center max-[780px]:hidden">
