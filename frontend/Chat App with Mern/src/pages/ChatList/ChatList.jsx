@@ -1,10 +1,10 @@
-import { FaPen, FaSearch, } from 'react-icons/fa';
+import {  FaCamera, FaCommentDots, FaDotCircle, FaPen, FaPhoneAlt, FaSearch, FaViadeo, FaVimeoSquare, } from 'react-icons/fa';
 import User from './User';
 
 
 const ChatList = () => {
     return (
-        <div className="max-w-[1600px] w-full mx-auto">
+        <div className="max-w-[1600px] w-full mx-auto bg-[#ffffff]">
             <div className="flex justify-between">
                 <div className="chats-sidebar max-w-[400px] w-full">
                     <div className="chats-header bg-[#009432] p-5">
@@ -64,8 +64,31 @@ const ChatList = () => {
                   </div>
                 
                 </div>
-                <div className="chats-body w-full  p-5">
-                        <h1>Chat body</h1>
+                <div className="chats-body w-full">
+                        <div className="w-full  p-5 border-b-[1px]">
+                            <div className="user flex items-center justify-between">
+                                <div className="flex items-center  ">
+                                    <div className=" w-10 h-10">
+                                        <img className="w-full h-full object-cover  rounded-full" src="/images/user-4.png" alt="user" />
+                                    </div>
+                                <div className="title ms-3">
+                                        <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">Michael   </h3>
+                                </div>
+                                </div>
+                                <div className="user-update text-[#009432] cursor-pointer hover:text-primary flex items-center text-xl">
+                                    <span className='ms-10'>
+                                    <FaPhoneAlt />
+                                    </span>
+                                    <span className='ms-10'>
+                                    <FaCamera />
+                                    </span>
+                                    <span className='ms-10'>
+                                    <FaCommentDots />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                      
                 </div>
             </div>
         </div>
