@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.friend-message {
+    @apply rounded-tr-2xl rounded-bl-3xl bg-[#FE483D] 
+}
+  
+.my-message {
+    @apply bg-[#009432] ml-auto rounded-tr-3xl rounded-bl-2xl
+}
+  

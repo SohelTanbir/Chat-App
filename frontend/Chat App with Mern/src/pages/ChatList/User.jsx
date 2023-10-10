@@ -1,7 +1,7 @@
 
 const User = ({avatar, name, message, time}) => {
     return (
-        <div className="user flex items-center justify-between cursor-pointer hover:bg-[#f3f3f3] py-4 px-5 rounded-sm border-b-[1px] border-[#F6F5F7] select-none">
+        <div className="user flex items-center justify-between cursor-pointer  hover:bg-[#f3f3f3] py-4 px-5 rounded-sm border-b-[1px] border-[#F6F5F7] select-none">
         <div className="flex items-center  ">
             <div className=" w-8 h-8">
                 <img className="w-full h-full object-cover  rounded-full" src={avatar} alt={name}/>

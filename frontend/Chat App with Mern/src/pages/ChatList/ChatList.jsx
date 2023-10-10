@@ -1,5 +1,6 @@
 import { FaPen, FaPhoneAlt, FaSearch, FaVideo } from 'react-icons/fa';
 import User from './User';
+import Message from '../../components/Message/Message';
 
 
 const ChatList = () => {
@@ -32,9 +33,9 @@ const ChatList = () => {
                   <div className="chat-lists w-full h-[80vh] bg-white overflow-x-auto border-e-[1px]">
                       <User avatar="/images/user-2.png" name="John" message="Hi, how are you?"  time="10:10PM"/>
 
-                      <User avatar="/images/user-3.png" name="Jessica" message="Hello Jessica"  time="12:10AM"/>
+                      <User avatar="/images/user-3.png" name="Jessica" message="Hello Jessica"  time="12:10AM" />
 
-                      <User avatar="/images/user-4.png" name="William" message="Hi, how are you?"  time="09:10PM"/>
+                      <User avatar="/images/user-4.png" name="Michael" message="Hey, your name please?"  time="09:10PM"/>
 
                       <User avatar="/images/user-5.png" name="David" message="Hi, how are you?"  time="11:30PM"/>
 
@@ -76,18 +77,38 @@ const ChatList = () => {
                                 </div>
                                 </div>
                                 <div className="user-update text-[#009432] cursor-pointer  flex items-center text-xl pr-5">
-                                    <span className='ms-10  hover:text-primary'>
+                                    <span className='ms-8  hover:text-primary'>
                                     <FaPhoneAlt />
                                     </span>
-                                    <span className='ms-10 hover:text-primary'>
+                                    <span className='ms-8 hover:text-primary'>
                                     <FaVideo />
                                     </span>
                                 </div>
                             </div>
                         </div>
-                      <div className="message-container h-[80vh] overflow-y-auto pt-1 px-5">
+                      <div className="message-container h-[80vh] overflow-y-auto  px-5 py-4">
 
-                       
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+
+                        <Message text="Hi, Michael, How are you ?" sender="me"/>
+
+
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
+                        <Message text="Hi, Sohel Rana" sender="friend"/>
                       </div>
                       <div className="message-input w-full bg-[#009432] py-2 px-5">
                       <form className='flex items-center justify-between relative' >
