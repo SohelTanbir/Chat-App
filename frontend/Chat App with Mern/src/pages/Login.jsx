@@ -33,7 +33,7 @@ const handleSumit = (e)=>{
 
 
    // redirect to all chats list pages
-   navigate("/chats");
+   navigate("/users/chats");
 }
 
 
