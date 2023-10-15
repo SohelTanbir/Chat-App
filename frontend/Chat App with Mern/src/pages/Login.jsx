@@ -20,18 +20,28 @@ const handleChange =(e)=>{
 }
 
 // submit the form and create account
-const handleSumit = (e)=>{
+const handleSumit = async (e)=>{
     e.preventDefault();
-    // if(!user.email || !user.password){
-    //     alert("All field are required!");
-    //     return;
-    // }
+    if(!user.email || !user.password){
+        alert("All field are required!");
+        return;
+    }
+    const res = await fetch('http://localhost:5000/api/v1/users/login',{
+        method:"POST",
+        headers:{"content-type":'application/json'},
+        body:JSON.stringify(user)
+    });
+    const {success, message} =  await res.json();
+    console.log("user =", user)
+    if(!success){
+        alert(message);
+        return;
+    } 
+    alert(message);
     setUser({
         email:"",
         password:"",
     });
-
-
    // redirect to all chats list pages
    navigate("/users/chats");
 }

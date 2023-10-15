@@ -82,7 +82,7 @@ const LoginUser = async (req, res) => {
     if(!isPasswordsCorrect){
        return res.status(201).json({
             success:false,
-            message:"Email or password incorrect!",
+            message:"Incorrect email or password !",
         });
     }
     // generate auth token
