@@ -554,6 +554,18 @@ video {
   top: 8px;
 }
 
+.left-0 {
+  left: 0px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.right-0 {
+  right: 0px;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -704,6 +716,10 @@ video {
   justify-content: space-between;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .overflow-x-auto {
   overflow-x: auto;
 }
@@ -756,6 +772,11 @@ video {
   background-color: rgb(238 238 238 / var(--tw-bg-opacity));
 }
 
+.bg-\[\#ddd\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(221 221 221 / var(--tw-bg-opacity));
+}
+
 .bg-\[\#fff\] {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -774,6 +795,74 @@ video {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#949494\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(148 148 148 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#eeeeee\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 238 238 / var(--tw-bg-opacity));
+}
+
+.bg-\[rgb\(0\2c 148\2c 50\)\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 148 50 / var(--tw-bg-opacity));
+}
+
+.bg-\[hsl\(140\2c 100\%\2c 29\%\)\] {
+  --tw-bg-opacity: 1;
+  background-color: hsl(140 100% 29% / var(--tw-bg-opacity));
+}
+
+.bg-\[\#cbcccb\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(203 204 203 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#6eae6e\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(110 174 110 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#4ea44e\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(78 164 78 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#000\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.bg-opacity-5 {
+  --tw-bg-opacity: 0.05;
+}
+
+.bg-opacity-50 {
+  --tw-bg-opacity: 0.5;
+}
+
+.bg-opacity-20 {
+  --tw-bg-opacity: 0.2;
+}
+
+.bg-opacity-0 {
+  --tw-bg-opacity: 0;
+}
+
+.bg-opacity-70 {
+  --tw-bg-opacity: 0.7;
+}
+
+.bg-opacity-80 {
+  --tw-bg-opacity: 0.8;
+}
+
+.bg-opacity-90 {
+  --tw-bg-opacity: 0.9;
 }
 
 .object-cover {
@@ -992,6 +1081,14 @@ video {
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
 .friend-message {

@@ -3,7 +3,8 @@ import {  faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-bra
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import {useNavigate } from 'react-router-dom';
-
+import { useAlert } from 'react-alert'
+import Loader from '../components/Loader/Loader';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -11,6 +12,10 @@ const Login = () => {
         email:"",
         password:"",
     });
+    const alert = useAlert();
+    const [loading, setLoading ] = useState(false);
+
+
 
 // get input field value
 const handleChange =(e)=>{
@@ -23,21 +28,25 @@ const handleChange =(e)=>{
 const handleSumit = async (e)=>{
     e.preventDefault();
     if(!user.email || !user.password){
-        alert("All field are required!");
+        alert.show("All field are required!");
         return;
     }
+    setLoading(true);
     const res = await fetch('http://localhost:5000/api/v1/users/login',{
         method:"POST",
         headers:{"content-type":'application/json'},
         body:JSON.stringify(user)
     });
-    const {success, message} =  await res.json();
-    console.log("user =", user)
+    const {success, message, token} =  await res.json();
     if(!success){
-        alert(message);
+        setLoading(false);
+        alert.error(message);
         return;
     } 
-    alert(message);
+    setLoading(false);
+    // save token to localStorage
+    localStorage.setItem("token", token);
+    alert.success(message);
     setUser({
         email:"",
         password:"",
@@ -62,6 +71,7 @@ const handleSumit = async (e)=>{
                     <div className='w-full'>
                     <h2 className=' font-Montserrat font-semibold  text-md text-primary mb-2 min-[780px]:hidden '>Welcome Back!</h2>
                     <h2 className=' font-Montserrat font-bold text-3xl mb-5'>Sign In</h2>
+                    <Loader loading={loading}/>
                     <div className="tex-center">
                         <ul className='flex justify-center items-center '>
                             <li className='w-10 h-10 border border-gray-300 text-center  font-normal text-md text-black flex justify-center items-center rounded-full mr-4 cursor-pointer hover:bg-primary hover:text-white '>

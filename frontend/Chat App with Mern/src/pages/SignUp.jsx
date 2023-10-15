@@ -3,17 +3,20 @@ import {  faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-bra
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import {useNavigate } from 'react-router-dom';
-
-
+import Loader from '../components/Loader/Loader';
+import { useAlert } from 'react-alert'
 
 
 const SignUp = () => {
+    const [loading, setLoading ] = useState(false);
     const navigate = useNavigate();
     const [user, setUser] =  useState({
         name:"",
         email:"",
         password:"",
     });
+    const alert = useAlert();
+
 
 // get input field value
 const handleChange =(e)=>{
@@ -26,22 +29,24 @@ const handleChange =(e)=>{
 const handleSumit = async (e)=>{
     e.preventDefault();
     if(!user.name || !user.email || !user.password){
-        alert("All field are required!");
+        alert.info("All field are required!");
         return;
     }
+    setLoading(true);
     const res = await fetch('http://localhost:5000/api/v1/users/register',{
         method:"POST",
         headers:{"content-type":'application/json'},
         body:JSON.stringify(user)
     });
     const {success, message} =  await res.json();
-    console.log("user =", user)
+
     if(!success){
-        alert("Failed to create an account!");
+        setLoading(false);
+        alert.error("Failed to create an account!");
         return;
     }
-    
-    alert(message);
+    setLoading(false);
+    alert.success(message);
     setUser({
         name:"",
         email:"",
@@ -57,6 +62,7 @@ const handleSumit = async (e)=>{
 
     return (
         <div id='auth-page'>
+
             <div className="flex">
                 <div className="max-w-[400px] w-full bg-primary px-5 py-8 text-center flex justify-center items-center max-[780px]:hidden ">
                     <div className="w-full">
@@ -97,6 +103,7 @@ const handleSumit = async (e)=>{
                     </div>
                 </div>
             </div>
+            <Loader loading={loading}/>
         </div>
     );
 };
