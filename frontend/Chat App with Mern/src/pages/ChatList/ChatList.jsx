@@ -84,10 +84,10 @@ const ChatList = () => {
                                 </div>
                                 </div>
                                 <div className="user-update text-[#009432] cursor-pointer  flex items-center text-xl pr-5">
-                                    <span className='ms-8  hover:text-primary'>
+                                    <span onClick={()=> alert("We are working on it!")}  className='ms-8  hover:text-primary'>
                                     <FaPhoneAlt />
                                     </span>
-                                    <span className='ms-8 hover:text-primary'>
+                                    <span onClick={()=> alert("We are working on it!")}  className='ms-8 hover:text-primary'>
                                     <FaVideo />
                                     </span>
                                 </div>

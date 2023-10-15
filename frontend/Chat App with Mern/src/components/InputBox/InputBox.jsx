@@ -14,9 +14,7 @@ const InputBox = () => {
 
     // get emoji input 
     const getEmoji = (emojiObj)=>{
-
-        const messageWithEmoji = [...newMessage, emojiObj.emoji]
-        setNewMessage(messageWithEmoji);
+        setNewMessage(newMessage+emojiObj.emoji);
         console.log(newMessage)
     }
 
