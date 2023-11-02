@@ -71,6 +71,7 @@ const LoginUser = async (req, res) => {
     try {
         // check already exists user with this email address
     const user = await User.find({email});
+    console.log(user)
     if(!user.length > 0) {
         return res.status(201).json({
             success:false,
@@ -91,7 +92,7 @@ const LoginUser = async (req, res) => {
         success:true,
         message:"Login success",
         token,
-        user:{
+        userData:{
             userId: user[0]._id,
           name: user[0].name,
           email

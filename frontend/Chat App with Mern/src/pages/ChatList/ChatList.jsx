@@ -3,13 +3,12 @@ import User from './User';
 import Message from '../../components/Message/Message';
 import InputBox from '../../components/InputBox/InputBox';
 import { useContext } from 'react';
-import { messageContext } from '../../App';
+import { appContext } from '../../App';
 
 
 const ChatList = () => {
-    const  [messages, setMessages ] =  useContext(messageContext);
-
-
+    const  [messages, setMessages ] =  useContext(appContext);
+    const [loggedInUser, setLoggedInUser ] = useContext(appContext);
 
     return (
         <div className="max-w-[1600px] w-full mx-auto bg-[#ffffff] mt-5">
@@ -22,8 +21,8 @@ const ChatList = () => {
                                     <img className="w-full h-full object-cover  rounded-full" src="/images/sohelrana.jpg" alt="user" />
                                 </div>
                             <div className="title ms-3">
-                                    <h3 className="font-sans font-semibold text-xl text-[#d9dee0] leading-[18px]  uppercase  ">Sohel Rana</h3>
-                                    <p className="font-sans font-normal text-[12px] text-[#d9dee0]   ">Software Developer</p>
+                                    <h3 className="font-sans font-semibold text-xl text-[#d9dee0] leading-[18px]  uppercase  ">{loggedInUser.name}</h3>
+                                    <p className="font-sans font-normal text-[12px] text-[#d9dee0]   ">{loggedInUser.email}</p>
                             </div>
                             </div>
                             <div className="user-update text-[#e5e7eb] cursor-pointer hover:text-primary">

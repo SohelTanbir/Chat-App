@@ -15,7 +15,13 @@ const userSchema =  mongoose.Schema({
         required: true,
     },
     photo:{
-        typeof: String,
+        public_id:{
+            type: String,
+        },
+        url:{
+            type: String,
+            default:""
+        }
     },
     role:{
         type:String,

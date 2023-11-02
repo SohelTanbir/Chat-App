@@ -1,13 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faFacebookF, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {useNavigate } from 'react-router-dom';
 import { useAlert } from 'react-alert'
 import Loader from '../components/Loader/Loader';
+import { appContext } from '../App';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [loggedInUser, setLoggedInUser ] = useContext(appContext);
     const [user, setUser] =  useState({
         email:"",
         password:"",
@@ -15,44 +17,55 @@ const Login = () => {
     const alert = useAlert();
     const [loading, setLoading ] = useState(false);
 
-
-
-// get input field value
-const handleChange =(e)=>{
-    const newUser  = {...user};
-    newUser[e.target.name] = e.target.value;
-    setUser(newUser);
-}
-
-// submit the form and create account
-const handleSumit = async (e)=>{
-    e.preventDefault();
-    if(!user.email || !user.password){
-        alert.show("All field are required!");
-        return;
+    // get input field value
+    const handleChange =(e)=>{
+        const newUser  = {...user};
+        newUser[e.target.name] = e.target.value;
+        setUser(newUser);
     }
-    setLoading(true);
-    const res = await fetch('http://localhost:5000/api/v1/users/login',{
-        method:"POST",
-        headers:{"content-type":'application/json'},
-        body:JSON.stringify(user)
-    });
-    const {success, message, token} =  await res.json();
-    if(!success){
-        setLoading(false);
-        alert.error(message);
-        return;
-    } 
-    setLoading(false);
-    // save token to localStorage
-    localStorage.setItem("token", token);
-    alert.success(message);
-    setUser({
-        email:"",
-        password:"",
-    });
-   // redirect to all chats list pages
-   navigate("/users/chats");
+
+    // submit the form and create account
+    const handleSumit = async (e)=>{
+        e.preventDefault();
+        if(!user.email || !user.password){
+            alert.show("All field are required!");
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/v1/users/login',{
+            method:"POST",
+            headers:{"content-type":'application/json'},
+            body:JSON.stringify(user)
+            });
+            const {success, message, token, userData} =  await res.json();
+            if(!success){
+                setLoading(false);
+                alert.error(message, {
+                    position:'top center'
+                });
+                return;
+            } 
+            setLoading(false);
+            // save token to localStorage
+            localStorage.setItem("token", token);
+            setLoggedInUser(userData);
+            alert.success(message, {
+                position:'top center'
+            });
+            setUser({
+                email:"",
+                password:"",
+            });
+        // redirect to all chats list pages
+        loggedInUser && navigate("/users/chats");
+    console.log('loggedInUser', loggedInUser)
+        } catch (err) {
+            setLoading(false);
+            alert.error("Sorry! we are unable to process the request", {
+                position:'top center'
+            });
+    }
 }
 
 

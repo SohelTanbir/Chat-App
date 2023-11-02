@@ -1,10 +1,10 @@
 import  { useContext, useState } from 'react';
-import { messageContext } from '../../App';
+import { appContext } from '../../App';
 import EmojiPicker from 'emoji-picker-react';
 
 const InputBox = () => {
     const [newMessage, setNewMessage] = useState("");
-    const  [messages, setMessages ] =  useContext(messageContext);
+    const  [messages, setMessages ] =  useContext(appContext);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     // get user input message 

@@ -33,29 +33,34 @@ const handleSumit = async (e)=>{
         return;
     }
     setLoading(true);
-    const res = await fetch('http://localhost:5000/api/v1/users/register',{
-        method:"POST",
-        headers:{"content-type":'application/json'},
-        body:JSON.stringify(user)
-    });
-    const {success, message} =  await res.json();
-
-    if(!success){
+    try {
+        const res = await fetch('http://localhost:5000/api/v1/users/register',{
+            method:"POST",
+            headers:{"content-type":'application/json'},
+            body:JSON.stringify(user)
+        });
+        const {success, message} =  await res.json();
+    
+        if(!success){
+            setLoading(false);
+            alert.error("Failed to create an account!");
+            return;
+        }
         setLoading(false);
-        alert.error("Failed to create an account!");
-        return;
+        alert.success(message);
+        setUser({
+            name:"",
+            email:"",
+            password:"",
+        });
+        // redirect to login page
+       setTimeout(()=>{
+        navigate("/login");
+       }, 1000);
+    } catch (err) {
+        setLoading(false);
+        alert.success("Sorry! we can't process the request at this moment");
     }
-    setLoading(false);
-    alert.success(message);
-    setUser({
-        name:"",
-        email:"",
-        password:"",
-    });
-    // redirect to login page
-   setTimeout(()=>{
-    navigate("/login");
-   }, 1000);
 }
 
 
