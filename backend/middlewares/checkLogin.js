@@ -12,8 +12,7 @@ const checkLogin = (req, res, next)=>{
   try {
     const token =  BearerToken.split(" ")[1];
      const {email, userId} = jwt.verify(token, process.env.JWT_SECREAT);
-     req.email = email;
-     req.userId = userId;
+     req.user =  {email, userId};
      next();
   } catch (err) {
     next("Your token invalid or  has expired !");

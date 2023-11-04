@@ -106,17 +106,39 @@ const LoginUser = async (req, res) => {
         });
     }
 
-
-
-
-
 }
 
+
+// get logged in user data
+const getLoggedInUser = async (req, res) =>{
+    const { email } = req.user;
+    try {
+        const user = await User.find({ email: email}).select("-password");
+        if(!user){
+           return res.status(404).json({
+                success:false,
+                error:"User not found",
+            });            
+        }
+        res.status(200).json({
+            success:true,
+            user,
+        });
+
+        
+    } catch (err) {
+        res.status(500).json({
+            success:false,
+            error:err.message,
+        });
+    }
+}
 
 
 
 // export controllers
 module.exports = {
     createUser,
-    LoginUser
+    LoginUser,
+    getLoggedInUser
 }
