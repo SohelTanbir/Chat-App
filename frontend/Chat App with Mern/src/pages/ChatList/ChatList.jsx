@@ -2,12 +2,42 @@ import { FaPen, FaPhoneAlt, FaSearch, FaVideo } from "react-icons/fa";
 import User from "./User";
 import Message from "../../components/Message/Message";
 import InputBox from "../../components/InputBox/InputBox";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { messageContext, userContext } from "../../App";
 
 const ChatList = () => {
   const [messages] = useContext(messageContext);
   const [loggedInUser] = useContext(userContext);
+  const [allUsers, setAllUsers] = useState([]);
+
+  const getAllUsers = async () => {
+    var myHeaders = new Headers();
+    myHeaders.append(
+      "Authorization",
+      `Bearer ${localStorage.getItem("token")}`
+    );
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/v1/users/all",
+        requestOptions
+      );
+      const { allUsers } = await response.json();
+      setAllUsers(allUsers);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
 
   return (
     <div className="max-w-[1600px] w-full mx-auto bg-[#ffffff] mt-5">
@@ -48,13 +78,21 @@ const ChatList = () => {
             </form>
           </div>
           <div className="chat-lists w-full h-[80vh] bg-white overflow-x-auto border-e-[1px]">
-            <User
-              avatar="/images/user-2.png"
-              name="John"
-              message="Hi, how are you?"
-              time="10:10PM"
-            />
-{/* 
+            {allUsers ? (
+              allUsers.map((user) => (
+                <User
+                  avatar="/images/user-2.png"
+                  name={user.name}
+                  message={`${user.name} Hi, how are you?`}
+                  time="10:10PM"
+                />
+              ))
+            ) : (
+              <h2 className="text-center text-base py-5 text-gray-600">
+                No users available
+              </h2>
+            )}
+            {/* 
             <User
               avatar="/images/user-3.png"
               name="Jessica"
@@ -197,7 +235,7 @@ const ChatList = () => {
                 />
               ))
             ) : (
-              <p className="w-full h-screen flex items-center justify-center text-2xl text-[#ddd]">
+              <p className="w-full h-full flex items-center justify-center text-2xl text-[#ddd]">
                 You don't have conversasion
               </p>
             )}
