@@ -61,19 +61,17 @@ const LoginUser = async (req, res) => {
     const {email, password} = req.body;
 
     if(!email || !password){
-        res.status(201).json({
+        return res.status(201).json({
             success:false,
             message:'Email and password are required',
         });
-        return;
     }
 
     try {
         // check already exists user with this email address
     const user = await User.find({email});
-    console.log(user)
     if(!user.length > 0) {
-        return res.status(201).json({
+        return res.status(404).json({
             success:false,
             message:"User not found!",
         });
@@ -107,7 +105,6 @@ const LoginUser = async (req, res) => {
     }
 
 }
-
 
 // get logged in user data
 const getLoggedInUser = async (req, res) =>{

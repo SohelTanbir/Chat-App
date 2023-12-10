@@ -3,12 +3,13 @@ import User from './User';
 import Message from '../../components/Message/Message';
 import InputBox from '../../components/InputBox/InputBox';
 import { useContext } from 'react';
-import { appContext } from '../../App';
+import { userContext } from '../../App';
+
 
 
 const ChatList = () => {
-    const  [messages, setMessages ] =  useContext(appContext);
-    const [loggedInUser, setLoggedInUser ] = useContext(appContext);
+    const  [ messages ] =  useContext(userContext);
+    const [loggedInUser ] = useContext(userContext);
 
     return (
         <div className="max-w-[1600px] w-full mx-auto bg-[#ffffff] mt-5">
