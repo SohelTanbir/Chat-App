@@ -52,7 +52,7 @@ const Login = () => {
       setLoading(false);
       // save token to localStorage
       localStorage.setItem("token", token);
-      // setLoggedInUser(userData);
+      setLoggedInUser(userData);
       alert.success(message, {
         position: "top center",
       });
@@ -61,8 +61,7 @@ const Login = () => {
         password: "",
       });
       // redirect to all chats list pages
-      console.log(loggedInUser);
-      navigate("/users/chats");
+      navigate("/");
     } catch (err) {
       setLoading(false);
       alert.error("Sorry! we are unable to process the request", {

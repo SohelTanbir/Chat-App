@@ -54,7 +54,7 @@ const ChatList = () => {
               message="Hi, how are you?"
               time="10:10PM"
             />
-
+{/* 
             <User
               avatar="/images/user-3.png"
               name="Jessica"
@@ -151,7 +151,7 @@ const ChatList = () => {
               name="Samuel"
               message="Tomar basa kothai?"
               time="11:30PM"
-            />
+            /> */}
           </div>
         </div>
         <div className="chats-body  w-full  relative">

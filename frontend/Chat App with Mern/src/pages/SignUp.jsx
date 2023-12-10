@@ -57,8 +57,8 @@ const SignUp = () => {
       });
       // redirect to login page
       setTimeout(() => {
-        navigate("/login");
-      }, 1000);
+        navigate("/account/login");
+      }, 500);
     } catch (err) {
       setLoading(false);
       alert.success("Sorry! we can't process the request at this moment");
