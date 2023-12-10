@@ -1032,11 +1032,13 @@ video {
   transition-duration: 150ms;
 }
 
-.friend-message {
+.friend-messag {
   border-top-right-radius: 1rem;
   border-bottom-left-radius: 1.5rem;
   --tw-bg-opacity: 1;
-  background-color: rgb(254 72 61 / var(--tw-bg-opacity));
+  background-color: rgb(128 139 159 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
 .my-message {
@@ -1045,6 +1047,8 @@ video {
   border-bottom-left-radius: 1rem;
   --tw-bg-opacity: 1;
   background-color: rgb(0 148 50 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
 .hover\:border-current:hover {
@@ -1105,4 +1109,3 @@ video {
     display: none;
   }
 }
-  
