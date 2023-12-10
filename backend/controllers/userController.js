@@ -1,141 +1,160 @@
-const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
+const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // create a new user
-const createUser = async (req, res)=>{
-    const {name, email, password, role} = req.body;
-    if(!name || !email || !password){
-        res.status(201).json({
-            success:false,
-            message:'Name, email and password are required',
-        });
-        return;
-    }
+const createUser = async (req, res) => {
+  const { name, email, password, role } = req.body;
+  if (!name || !email || !password) {
+    res.status(201).json({
+      success: false,
+      message: "Name, email and password are required",
+    });
+    return;
+  }
 
-    // check already exists user with this email address
-    const userExist = await User.find({email});
-    if(userExist.length > 0) {
-        res.status(201).json({
-            success:false,
-            message:'User already exists with this email address!',
-        });
-        return;
-    }
+  // check already exists user with this email address
+  const userExist = await User.find({ email });
+  if (userExist.length > 0) {
+    res.status(201).json({
+      success: false,
+      message: "User already exists with this email address!",
+    });
+    return;
+  }
 
-
-    const salt = await bcrypt.genSalt(10);
-    const hasPassword = await bcrypt.hash(password, salt);
-    const userData = {
-        name, 
-        email, 
-        role,
-        password:hasPassword
+  const salt = await bcrypt.genSalt(10);
+  const hasPassword = await bcrypt.hash(password, salt);
+  const userData = {
+    name,
+    email,
+    role,
+    password: hasPassword,
+  };
+  const newUser = await User.create(userData);
+  try {
+    const result = await newUser.save();
+    if (!result) {
+      res.status(500).json({
+        success: false,
+        message: "User created Failed!",
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: "User created successfully",
+        user: result,
+      });
     }
-    const newUser  = await User.create(userData);
-    try {
-       const result = await  newUser.save();
-        if(!result){
-            res.status(500).json({
-                success:false,
-                message:'User created Failed!'
-            })
-        }else{
-        res.status(201).json({
-            success:true,
-            message:'User created successfully',
-            user:result
-        })
-        }
-    } catch (error) {
-        res.status(500).json({
-            success:false,
-            message:'There was an server error!'
-        })
-    }
-}
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "There was an server error!",
+    });
+  }
+};
 
 // Login user
 const LoginUser = async (req, res) => {
-    const {email, password} = req.body;
+  const { email, password } = req.body;
 
-    if(!email || !password){
-        return res.status(201).json({
-            success:false,
-            message:'Email and password are required',
-        });
-    }
+  if (!email || !password) {
+    return res.status(201).json({
+      success: false,
+      message: "Email and password are required",
+    });
+  }
 
-    try {
-        // check already exists user with this email address
-    const user = await User.find({email});
-    if(!user.length > 0) {
-        return res.status(404).json({
-            success:false,
-            message:"User not found!",
-        });
+  try {
+    // check already exists user with this email address
+    const user = await User.find({ email });
+    if (!user.length > 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
     }
     // check  password is correct or not
-    const isPasswordsCorrect =  await bcrypt.compare(password, user[0].password);
-    if(!isPasswordsCorrect){
-       return res.status(201).json({
-            success:false,
-            message:"Incorrect email or password !",
-        });
+    const isPasswordsCorrect = await bcrypt.compare(password, user[0].password);
+    if (!isPasswordsCorrect) {
+      return res.status(201).json({
+        success: false,
+        message: "Incorrect email or password !",
+      });
     }
     // generate auth token
-    const token = jwt.sign({email,userId:user[0]._id}, process.env.JWT_SECREAT,{ expiresIn: '1h' });
+    const token = jwt.sign(
+      { email, userId: user[0]._id },
+      process.env.JWT_SECREAT,
+      { expiresIn: "1h" }
+    );
     res.status(201).json({
-        success:true,
-        message:"Login success",
-        token,
-        userData:{
-            userId: user[0]._id,
-          name: user[0].name,
-          email
-        }
+      success: true,
+      message: "Login success",
+      token,
+      userData: {
+        userId: user[0]._id,
+        name: user[0].name,
+        email,
+      },
     });
-
-    } catch (err) {
-        res.status(201).json({
-            success:false,
-            error:err.message,
-        });
-    }
-
-}
+  } catch (err) {
+    res.status(201).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
 
 // get logged in user data
-const getLoggedInUser = async (req, res) =>{
-    const { email } = req.user;
-    try {
-        const user = await User.find({ email: email}).select("-password");
-        if(!user){
-           return res.status(404).json({
-                success:false,
-                error:"User not found",
-            });            
-        }
-        res.status(200).json({
-            success:true,
-            user,
-        });
-
-        
-    } catch (err) {
-        res.status(500).json({
-            success:false,
-            error:err.message,
-        });
+const getLoggedInUser = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const user = await User.find({ email: email }).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found",
+      });
     }
-}
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
 
-
+// get all users chats list to start new chat
+const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    if (!allUsers.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Sorry, Chat list is not available!",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      allUsers,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "There was an sever error",
+    });
+  }
+};
 
 // export controllers
 module.exports = {
-    createUser,
-    LoginUser,
-    getLoggedInUser
-}
+  createUser,
+  LoginUser,
+  getLoggedInUser,
+  getAllUsers,
+};
