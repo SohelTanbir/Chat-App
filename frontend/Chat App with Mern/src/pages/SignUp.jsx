@@ -149,7 +149,7 @@ const SignUp = () => {
           </div>
         </div>
       </div>
-      <Loader loading={loading} />
+      <Loader backdrop={loading} size={70} />
     </div>
   );
 };

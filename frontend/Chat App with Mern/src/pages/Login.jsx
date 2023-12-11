@@ -85,7 +85,7 @@ const Login = () => {
             <h2 className=" font-Montserrat font-bold text-3xl mb-5">
               Sign In
             </h2>
-            <Loader loading={loading} />
+            <Loader backdrop={loading}  size={70}/>
             <div className="tex-center">
               <ul className="flex justify-center items-center ">
                 <li className="w-10 h-10 border border-gray-300 text-center  font-normal text-md text-black flex justify-center items-center rounded-full mr-4 cursor-pointer hover:bg-primary hover:text-white ">
