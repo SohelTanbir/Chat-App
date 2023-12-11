@@ -48,7 +48,7 @@ const ChatList = () => {
   }, []);
 
   return (
-    <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5">
+    <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">
       <div className="flex justify-between">
         <div className="chats-sidebar max-w-[400px] w-full">
           <div className="chats-header bg-[#009432] p-5">
@@ -93,12 +93,13 @@ const ChatList = () => {
                 </div>
               ) : allUsers ? (
                 allUsers.map((user) => (
-                  <User
-                    avatar={user.photo.url}
-                    name={user.name}
-                    message={`${user.name} Hi, how are you?`}
-                    time="10:10PM"
-                  />
+                  <User user={user} />
+                  // <User
+                  //   avatar={user.photo.url}
+                  //   name={user.name}
+                  //   message={`${user.name} Hi, how are you?`}
+                  //   time="10:10PM"
+                  // />
                 ))
               ) : (
                 <h2 className="text-center text-base py-5 text-gray-600">

@@ -132,7 +132,7 @@ const getLoggedInUser = async (req, res) => {
 // get all users chats list to start new chat
 const getAllUsers = async (req, res) => {
   try {
-    const allUsers = await User.find({});
+    const allUsers = await User.find({}).select("-password");
     if (!allUsers.length) {
       return res.status(404).json({
         success: false,
