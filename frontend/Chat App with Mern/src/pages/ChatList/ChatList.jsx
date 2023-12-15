@@ -11,6 +11,11 @@ const ChatList = () => {
   const [loggedInUser] = useContext(userContext);
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(false);
+  // handle select user and start conversation
+  const handleStartConversation = (userId) => {
+    setSelectedUserId(userId);
+  };
 
   const getAllUsers = async () => {
     var myHeaders = new Headers();
@@ -93,13 +98,12 @@ const ChatList = () => {
                 </div>
               ) : allUsers ? (
                 allUsers.map((user) => (
-                  <User user={user} />
-                  // <User
-                  //   avatar={user.photo.url}
-                  //   name={user.name}
-                  //   message={`${user.name} Hi, how are you?`}
-                  //   time="10:10PM"
-                  // />
+                  <User
+                    user={user}
+                    key={user._id}
+                    selectedUserId={selectedUserId}
+                    handleStartConversation={handleStartConversation}
+                  />
                 ))
               ) : (
                 <h2 className="text-center text-base py-5 text-gray-600">
@@ -117,13 +121,17 @@ const ChatList = () => {
                   <div className=" w-10 h-10">
                     <img
                       className="w-full h-full object-cover  rounded-full"
-                      src="/images/user-4.png"
+                      src={`${
+                        messages[0].photo.url
+                          ? messages[0].photo.url
+                          : "/images/user-default.png"
+                      }`}
                       alt="user"
                     />
                   </div>
                   <div className="title ms-3">
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
-                      Michael
+                      {messages[0].name}
                     </h3>
                   </div>
                 </div>
@@ -148,7 +156,7 @@ const ChatList = () => {
                 messages.map((message) => (
                   <Message
                     key={message}
-                    text={message}
+                    text="Hello "
                     sender={`${message.length > 10 ? "friend" : "me"}`}
                   />
                 ))

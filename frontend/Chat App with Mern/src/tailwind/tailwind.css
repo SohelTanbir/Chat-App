@@ -9,3 +9,6 @@
 .my-message {
   @apply bg-[#009432] ml-auto rounded-tr-3xl rounded-bl-2xl text-black;
 }
+.selecatedUser {
+  @apply bg-[#f3f3f3];
+}
