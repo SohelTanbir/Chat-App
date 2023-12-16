@@ -14,9 +14,31 @@ const ChatList = () => {
   const [selectedUserId, setSelectedUserId] = useState(false);
   // handle select user and start conversation
   const handleStartConversation = (user) => {
+    var myHeaders = new Headers();
+    myHeaders.append(
+      "Authorization",
+      `Bearer ${localStorage.getItem("token")}`
+    );
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      senderId: loggedInUser._id,
+      receiverId: user._id,
+    });
+
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:5000/api/v1/chat/create", requestOptions)
+      .then((response) => response.json())
+      .then((result) => result)
+      .catch((err) => err);
+
     setMessages([user]);
-    console.log(user);
-    console.log(messages);
     setSelectedUserId(user._id);
   };
 
