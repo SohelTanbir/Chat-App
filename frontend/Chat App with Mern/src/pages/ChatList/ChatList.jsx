@@ -11,9 +11,11 @@ const ChatList = () => {
   const [loggedInUser] = useContext(userContext);
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(false);
-  // handle select user and start conversation
-  const handleStartConversation = (user) => {
+  const [selectedUser, setSelectedUser] = useState(false);
+  const [chatId, setChatId] = useState("");
+  // console.log(messages);
+  // handle select user and create new chat
+  const handleStartConversation = async (user) => {
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
@@ -33,13 +35,15 @@ const ChatList = () => {
       redirect: "follow",
     };
 
-    fetch("http://localhost:5000/api/v1/chat/create", requestOptions)
-      .then((response) => response.json())
-      .then((result) => result)
-      .catch((err) => err);
+    const response = await fetch(
+      "http://localhost:5000/api/v1/chat/create",
+      requestOptions
+    );
+    const { userChat } = await response.json();
+    setChatId(userChat._id);
 
     setMessages([user]);
-    setSelectedUserId(user._id);
+    setSelectedUser(user);
   };
 
   const getAllUsers = async () => {
@@ -76,6 +80,38 @@ const ChatList = () => {
   useEffect(() => {
     getAllUsers();
   }, []);
+
+  // retrive users messages
+  const getUsersMessages = async () => {
+    var myHeaders = new Headers();
+    myHeaders.append(
+      "Authorization",
+      `Bearer ${localStorage.getItem("token")}`
+    );
+    myHeaders.append("Content-Type", "application/json");
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/v1/message/find/chat/657d4065aff8a355189b3d32`,
+        requestOptions
+      );
+      const result = await response.json();
+      console.log("result.messages", result.messages);
+      setMessages(result.messages);
+    } catch (err) {
+      console.log("error ", err.message);
+    }
+  };
+
+  // retrive users messages
+  useEffect(() => {
+    getUsersMessages();
+  }, [chatId]);
 
   return (
     <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">
@@ -126,7 +162,7 @@ const ChatList = () => {
                   <User
                     user={user}
                     key={user._id}
-                    selectedUserId={selectedUserId}
+                    selectedUser={selectedUser}
                     handleStartConversation={handleStartConversation}
                   />
                 ))
@@ -138,7 +174,7 @@ const ChatList = () => {
             </div>
           </div>
         </div>
-        {messages.length > 0 ? (
+        {selectedUser ? (
           <div className="chats-body  w-full  relative">
             <div className="w-full  p-5 border-b-[1px]">
               <div className="user flex items-center justify-between">
@@ -147,8 +183,8 @@ const ChatList = () => {
                     <img
                       className="w-full h-full object-cover  rounded-full"
                       src={`${
-                        messages[0]?.photo?.url
-                          ? messages[0].photo.url
+                        selectedUser.photo?.url
+                          ? selectedUser.photo.url
                           : "/images/user-default.png"
                       }`}
                       alt="user"
@@ -156,7 +192,8 @@ const ChatList = () => {
                   </div>
                   <div className="title ms-3">
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
-                      {messages[0].name}
+                      {selectedUser.name}{" "}
+                      {loggedInUser._id == selectedUser._id ? "(You)" : ""}
                     </h3>
                   </div>
                 </div>
@@ -178,24 +215,26 @@ const ChatList = () => {
             </div>
             <div className="message-container h-[80vh] overflow-y-auto  px-5 py-4">
               {messages.length > 0 ? (
-                messages.map((message) => (
+                messages?.map((message) => (
                   <Message
                     key={message}
-                    text="Hello "
-                    sender={`${message.length > 10 ? "friend" : "me"}`}
+                    text={message.message}
+                    sender={`${
+                      message.senderId == loggedInUser._id ? "me" : "friend"
+                    }`}
                   />
                 ))
               ) : (
                 <p className="w-full h-full flex items-center justify-center text-2xl text-[#ddd]">
-                  No Conversasion
+                  No Message
                 </p>
               )}
             </div>
-            <InputBox name="Sohel Rana" />
+            <InputBox name={selectedUser ? selectedUser.name : ""} />
           </div>
         ) : (
           <p className="w-full h-screen flex items-center justify-center text-2xl text-[#ddd]">
-            Choose Person to Start Conversasion
+            Tap to start Conversasion
           </p>
         )}
       </div>

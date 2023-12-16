@@ -17,6 +17,7 @@ const createChat = async (req, res) => {
     return res.status(200).json({
       success: false,
       message: "Chat already exists with this user!",
+      userChat: isChatExists,
     });
   }
 

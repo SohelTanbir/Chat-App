@@ -20,8 +20,31 @@ const InputBox = ({ name }) => {
   // send message
   const handleSubmit = (e) => {
     e.preventDefault();
-    const message = [...messages, newMessage];
-    setMessages(message);
+    var myHeaders = new Headers();
+    myHeaders.append(
+      "Authorization",
+      `Bearer ${localStorage.getItem("token")}`
+    );
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      chatId: "657d4065aff8a355189b3d32",
+      senderId: "657614d0468e78b0eb7e1d3e",
+      message: newMessage,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch("http://localhost:5000/api/v1/message/create", requestOptions)
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+
+    setMessages(newMessage);
     setShowEmojiPicker(false);
     setNewMessage("");
   };

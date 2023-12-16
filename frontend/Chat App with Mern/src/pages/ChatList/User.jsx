@@ -1,9 +1,9 @@
-const User = ({ user, handleStartConversation, selectedUserId }) => {
+const User = ({ user, handleStartConversation, selectedUser }) => {
   return (
     <div
       onClick={() => handleStartConversation(user)}
       className={`${
-        selectedUserId == user._id ? "selecatedUser" : ""
+        selectedUser._id == user._id ? "selecatedUser" : ""
       } user flex items-center justify-between cursor-pointer   hover:bg-[#fbfbfb] py-4 px-5 rounded-sm border-b-[1px] border-[#F6F5F7] select-none`}
     >
       <div className="flex items-center  ">
