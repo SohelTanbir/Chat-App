@@ -1,7 +1,7 @@
 const mongoose =  require('mongoose');
 
 const chatSchema = mongoose.Schema({
-    friends:{
+    users:{
             type: Array,
             senderId: String,
             receiver: String,

@@ -15,7 +15,7 @@ const checkLogin = (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    next("Your token invalid or  has expired !");
+    next("Your token is invalid or  has expired !");
   }
 };
 

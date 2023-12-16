@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { messageContext } from "../../App";
 
-const InputBox = () => {
+const InputBox = ({ name }) => {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useContext(messageContext);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -42,7 +42,7 @@ const InputBox = () => {
           onChange={handleChange}
           onFocus={() => setShowEmojiPicker(false)}
           className="w-[95%]   p-2 ps-12  rounded-md focus:outline-none"
-          placeholder="Message to Michael"
+          placeholder={`Message to ${name}`}
           value={newMessage}
           spellCheck={false}
         />

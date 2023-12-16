@@ -7,14 +7,17 @@ import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
 
 const ChatList = () => {
-  const [messages] = useContext(messageContext);
+  const [messages, setMessages] = useContext(messageContext);
   const [loggedInUser] = useContext(userContext);
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(false);
   // handle select user and start conversation
-  const handleStartConversation = (userId) => {
-    setSelectedUserId(userId);
+  const handleStartConversation = (user) => {
+    setMessages([user]);
+    console.log(user);
+    console.log(messages);
+    setSelectedUserId(user._id);
   };
 
   const getAllUsers = async () => {
@@ -122,7 +125,7 @@ const ChatList = () => {
                     <img
                       className="w-full h-full object-cover  rounded-full"
                       src={`${
-                        messages[0].photo.url
+                        messages[0]?.photo?.url
                           ? messages[0].photo.url
                           : "/images/user-default.png"
                       }`}
@@ -166,7 +169,7 @@ const ChatList = () => {
                 </p>
               )}
             </div>
-            <InputBox />
+            <InputBox name="Sohel Rana" />
           </div>
         ) : (
           <p className="w-full h-screen flex items-center justify-center text-2xl text-[#ddd]">
