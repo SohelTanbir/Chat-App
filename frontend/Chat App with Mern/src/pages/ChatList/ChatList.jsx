@@ -11,9 +11,10 @@ const ChatList = () => {
   const [loggedInUser] = useContext(userContext);
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(false);
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
-  // console.log(messages);
+
   // handle select user and create new chat
   const handleStartConversation = async (user) => {
     var myHeaders = new Headers();
@@ -95,15 +96,18 @@ const ChatList = () => {
       headers: myHeaders,
       redirect: "follow",
     };
+    setLoadingMessage(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/message/find/chat/657d4065aff8a355189b3d32`,
+        `http://localhost:5000/api/v1/message/find/chat/${chatId}`,
         requestOptions
       );
       const result = await response.json();
       console.log("result.messages", result.messages);
       setMessages(result.messages);
+      setLoadingMessage(false);
     } catch (err) {
+      setLoadingMessage(false);
       console.log("error ", err.message);
     }
   };
@@ -213,24 +217,36 @@ const ChatList = () => {
                 </div>
               </div>
             </div>
-            <div className="message-container h-[80vh] overflow-y-auto  px-5 py-4">
-              {messages.length > 0 ? (
-                messages?.map((message) => (
-                  <Message
-                    key={message}
-                    text={message.message}
-                    sender={`${
-                      message.senderId == loggedInUser._id ? "me" : "friend"
-                    }`}
-                  />
-                ))
-              ) : (
-                <p className="w-full h-full flex items-center justify-center text-2xl text-[#ddd]">
-                  No Message
-                </p>
-              )}
-            </div>
-            <InputBox name={selectedUser ? selectedUser.name : ""} />
+            {!loadingMessage ? (
+              <>
+                <div className="message-container h-[80vh] overflow-y-auto  px-5 py-4">
+                  {messages?.length > 0 ? (
+                    messages?.map((message) => (
+                      <Message
+                        key={message._id}
+                        text={message.message}
+                        sender={`${
+                          message.senderId == loggedInUser._id ? "me" : "friend"
+                        }`}
+                      />
+                    ))
+                  ) : (
+                    <p className="w-full h-full flex items-center justify-center text-2xl text-[#ddd]">
+                      No Message
+                    </p>
+                  )}
+                </div>
+
+                <InputBox
+                  name={selectedUser ? selectedUser.name : ""}
+                  chatId={chatId}
+                />
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Loader />
+              </div>
+            )}
           </div>
         ) : (
           <p className="w-full h-screen flex items-center justify-center text-2xl text-[#ddd]">

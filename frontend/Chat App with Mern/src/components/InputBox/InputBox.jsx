@@ -1,10 +1,11 @@
 import { useContext, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
-import { messageContext } from "../../App";
+import { messageContext, userContext } from "../../App";
 
-const InputBox = ({ name }) => {
+const InputBox = ({ name, chatId }) => {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useContext(messageContext);
+  const [loggedInUser] = useContext(userContext);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // get user input message
@@ -18,7 +19,7 @@ const InputBox = ({ name }) => {
   };
 
   // send message
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     var myHeaders = new Headers();
     myHeaders.append(
@@ -28,8 +29,8 @@ const InputBox = ({ name }) => {
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
-      chatId: "657d4065aff8a355189b3d32",
-      senderId: "657614d0468e78b0eb7e1d3e",
+      chatId,
+      senderId: loggedInUser._id,
       message: newMessage,
     });
     var requestOptions = {
@@ -39,14 +40,16 @@ const InputBox = ({ name }) => {
       redirect: "follow",
     };
 
-    fetch("http://localhost:5000/api/v1/message/create", requestOptions)
-      .then((response) => response.json())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
-
-    setMessages(newMessage);
-    setShowEmojiPicker(false);
-    setNewMessage("");
+    const respons = await fetch(
+      "http://localhost:5000/api/v1/message/create",
+      requestOptions
+    );
+    const { success, userMessages } = await respons.json();
+    if (success && userMessages) {
+      setMessages(userMessages);
+      setShowEmojiPicker(false);
+      setNewMessage("");
+    }
   };
 
   return (
