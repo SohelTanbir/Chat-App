@@ -10,7 +10,6 @@ import { transitions, positions, Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Home from "./pages/Home/Home";
-
 export const userContext = createContext();
 export const messageContext = createContext();
 

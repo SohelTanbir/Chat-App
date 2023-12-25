@@ -2,11 +2,15 @@ const express = require("express");
 const dotenv = require("dotenv");
 const http = require("http");
 const cors = require("cors");
-const socket = require("socket.io");
+const { Server } = require("socket.io");
 
 const app = express();
-const server = http.createServer(app);
-const io = socket(server);
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+  },
+});
 app.use(cors());
 app.use(express.json());
 const connectDatabase = require("./Database/databaseConnecion");
@@ -20,6 +24,9 @@ connectDatabase();
 // socket connection
 io.on("connection", (socket) => {
   console.log("User connected!");
+
+  // send message to client
+  io.emit("message", "This message from server");
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -54,6 +61,6 @@ const errorHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 // listen server  on port
-server.listen(process.env.PORT || 5500, () => {
+httpServer.listen(process.env.PORT || 5500, () => {
   console.log(`Server listening on port ${process.env.PORT || 5500}`);
 });
