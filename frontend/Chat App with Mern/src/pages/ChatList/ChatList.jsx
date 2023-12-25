@@ -103,12 +103,10 @@ const ChatList = () => {
         requestOptions
       );
       const result = await response.json();
-      console.log("result.messages", result.messages);
       setMessages(result.messages);
       setLoadingMessage(false);
     } catch (err) {
       setLoadingMessage(false);
-      console.log("error ", err.message);
     }
   };
 

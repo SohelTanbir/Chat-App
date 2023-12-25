@@ -1,6 +1,4 @@
 const Message = ({ text, sender }) => {
-  console.log("sender", sender);
-
   return (
     <div
       className={`${

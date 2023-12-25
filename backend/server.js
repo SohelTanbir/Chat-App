@@ -2,8 +2,11 @@ const express = require("express");
 const dotenv = require("dotenv");
 const http = require("http");
 const cors = require("cors");
+const socket = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = socket(server);
 app.use(cors());
 app.use(express.json());
 const connectDatabase = require("./Database/databaseConnecion");
@@ -13,6 +16,15 @@ dotenv.config();
 
 // database connection
 connectDatabase();
+
+// socket connection
+io.on("connection", (socket) => {
+  console.log("User connected!");
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 
 // import all routes
 const userRoutes = require("./routes/userRoutes");
@@ -42,6 +54,6 @@ const errorHandler = (err, req, res, next) => {
 app.use(errorHandler);
 
 // listen server  on port
-app.listen(process.env.PORT || 5500, () => {
+server.listen(process.env.PORT || 5500, () => {
   console.log(`Server listening on port ${process.env.PORT || 5500}`);
 });
