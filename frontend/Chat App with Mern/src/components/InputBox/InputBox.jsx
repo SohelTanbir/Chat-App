@@ -1,12 +1,22 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { messageContext, userContext } from "../../App";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const InputBox = ({ name, chatId }) => {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useContext(messageContext);
   const [loggedInUser] = useContext(userContext);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  useEffect(() => {
+    // Receive message from server
+    socket.on("message", (msg) => {
+      console.log("message from server real time ->> ", msg);
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
+  }, []);
 
   // get user input message
   const handleChange = (e) => {
@@ -21,6 +31,15 @@ const InputBox = ({ name, chatId }) => {
   // send message
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    //Receive message from server
+    socket.on("message", (msg) => {
+      console.log(msg);
+    });
+
+    // send message to server
+    socket.emit("sendMessage", { user: loggedInUser, message: newMessage });
+
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",

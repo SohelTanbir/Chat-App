@@ -85,7 +85,7 @@ const Login = () => {
             <h2 className=" font-Montserrat font-bold text-3xl mb-5">
               Sign In
             </h2>
-            <Loader backdrop={loading}  size={70}/>
+            <Loader backdrop={loading} size={70} />
             <div className="tex-center">
               <ul className="flex justify-center items-center ">
                 <li className="w-10 h-10 border border-gray-300 text-center  font-normal text-md text-black flex justify-center items-center rounded-full mr-4 cursor-pointer hover:bg-primary hover:text-white ">
@@ -127,7 +127,7 @@ const Login = () => {
             </form>
             <p className=" font-normal text-primary text-center text-[12px] md:text-sm py-3 min-[780px]:hidden">
               Dont have an account?{" "}
-              <Link to="/">
+              <Link to="/account/register">
                 {" "}
                 <span className="underline">Sign Up</span>{" "}
               </Link>

@@ -21,17 +21,24 @@ dotenv.config();
 // database connection
 connectDatabase();
 
-// socket connection
+// socket connection start
 io.on("connection", (socket) => {
-  console.log("User connected!");
+  console.log("New user connected");
 
-  // send message to client
-  io.emit("message", "This message from server");
+  // recieve message from client
+  socket.on("sendMessage", ({ user, message }) => {
+    // send message to all clients
+    io.emit("message", message); // Broadcast the message to all connected clients
+    console.log("send --> ", user.name);
+    console.log("message --> ", message);
+  });
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
+
+// socket connection end
 
 // import all routes
 const userRoutes = require("./routes/userRoutes");

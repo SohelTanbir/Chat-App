@@ -2,7 +2,7 @@ import { FaPen, FaPhoneAlt, FaSearch, FaVideo } from "react-icons/fa";
 import User from "./User";
 import Message from "../../components/Message/Message";
 import InputBox from "../../components/InputBox/InputBox";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
 
@@ -14,6 +14,16 @@ const ChatList = () => {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
+
+  const messageContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+      });
+    }
+  }, [messages]);
 
   // handle select user and create new chat
   const handleStartConversation = async (user) => {
@@ -118,7 +128,7 @@ const ChatList = () => {
   return (
     <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">
       <div className="flex justify-between">
-        <div className="chats-sidebar max-w-[400px] w-full">
+        <div className="chats-sidebar max-w-[350px] w-full">
           <div className="chats-header bg-[#009432] p-5">
             <div className="user mb-5 flex items-center justify-between">
               <div className="flex items-center  ">
@@ -195,7 +205,7 @@ const ChatList = () => {
                   <div className="title ms-3">
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
                       {selectedUser.name}{" "}
-                      {loggedInUser._id == selectedUser._id ? "(You)" : ""}
+                      {loggedInUser._id === selectedUser._id ? "(You)" : ""}
                     </h3>
                   </div>
                 </div>
@@ -217,7 +227,10 @@ const ChatList = () => {
             </div>
             {!loadingMessage ? (
               <>
-                <div className="message-container h-[80vh] overflow-y-auto  px-5 py-4">
+                <div
+                  ref={messageContainerRef}
+                  className="message-container h-[80vh] overflow-y-auto  px-5 py-4"
+                >
                   {messages?.length > 0 ? (
                     messages?.map((message) => (
                       <Message
