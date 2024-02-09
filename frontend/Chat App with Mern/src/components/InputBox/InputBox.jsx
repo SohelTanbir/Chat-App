@@ -12,9 +12,8 @@ const InputBox = ({ name, chatId }) => {
 
   useEffect(() => {
     // Receive message from server
-    socket.on("message", (msg) => {
-      console.log("message from server real time ->> ", msg);
-      setMessages((prevMessages) => [...prevMessages, msg]);
+    socket.on("message", (updatedMessages) => {
+      setMessages(updatedMessages);
     });
   }, []);
 
@@ -31,15 +30,6 @@ const InputBox = ({ name, chatId }) => {
   // send message
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    //Receive message from server
-    socket.on("message", (msg) => {
-      console.log(msg);
-    });
-
-    // send message to server
-    socket.emit("sendMessage", { user: loggedInUser, message: newMessage });
-
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
@@ -65,6 +55,8 @@ const InputBox = ({ name, chatId }) => {
     );
     const { success, userMessages } = await respons.json();
     if (success && userMessages) {
+      // send message to server
+      socket.emit("sendMessage", { user: loggedInUser, message: userMessages });
       setMessages(userMessages);
       setShowEmojiPicker(false);
       setNewMessage("");
