@@ -35,7 +35,7 @@ const createChat = async (req, res) => {
       message: "Chat created successfully",
     });
   } catch (err) {
-    console.log(err);
+    return err;
   }
 };
 

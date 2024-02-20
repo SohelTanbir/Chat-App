@@ -8,10 +8,14 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "*",
   },
 });
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 const connectDatabase = require("./Database/databaseConnecion");
 
@@ -28,9 +32,7 @@ io.on("connection", (socket) => {
   // recieve message from client
   socket.on("sendMessage", ({ user, message }) => {
     // send message to all clients
-    io.emit("message", message); // Broadcast the message to all connected clients
-    console.log("send --> ", user.name);
-    console.log("message --> ", message);
+    io.emit("message", message);
   });
 
   socket.on("disconnect", () => {

@@ -26,12 +26,11 @@ function App() {
         });
         const { user } = await res.json();
         if (!user) {
-          console.log("Couldn't find user");
           return;
         }
         setLoggedInUser(user[0]);
       } catch (err) {
-        console.log(err.message);
+       return err;
       }
     };
 

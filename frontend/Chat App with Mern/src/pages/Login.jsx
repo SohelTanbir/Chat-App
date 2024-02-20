@@ -64,7 +64,7 @@ const Login = () => {
       navigate("/");
     } catch (err) {
       setLoading(false);
-      alert.error("Sorry! we are unable to process the request", {
+      alert.error(err, {
         position: "top center",
       });
     }

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const checkLogin = (req, res, next) => {
-  const BearerToken = req.header("Authorization");
+  const BearerToken = req.header("Authorization") || null;
 
   if (BearerToken == undefined || BearerToken == "") {
     next("Authentication is required!");
@@ -14,7 +14,6 @@ const checkLogin = (req, res, next) => {
     req.user = { email, userId };
     next();
   } catch (err) {
-    console.log(err);
     next("Your token is invalid or  has expired !");
   }
 };

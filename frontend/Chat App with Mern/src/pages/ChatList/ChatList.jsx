@@ -51,10 +51,11 @@ const ChatList = () => {
       requestOptions
     );
     const { userChat } = await response.json();
-    setChatId(userChat._id);
-
-    setMessages([user]);
-    setSelectedUser(user);
+    if (userChat._id) {
+      setChatId(userChat._id);
+      setMessages(user);
+      setSelectedUser(user);
+    }
   };
 
   const getAllUsers = async () => {
@@ -84,7 +85,6 @@ const ChatList = () => {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      console.log(err);
     }
   };
 
@@ -107,6 +107,9 @@ const ChatList = () => {
       redirect: "follow",
     };
     setLoadingMessage(true);
+    if (!chatId.length > 0) {
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:5000/api/v1/message/find/chat/${chatId}`,
@@ -123,7 +126,7 @@ const ChatList = () => {
   // retrive users messages
   useEffect(() => {
     getUsersMessages();
-  }, [chatId]);
+  }, [chatId.length]);
 
   return (
     <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">
