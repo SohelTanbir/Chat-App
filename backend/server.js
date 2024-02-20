@@ -35,6 +35,12 @@ io.on("connection", (socket) => {
     io.emit("message", message);
   });
 
+  // detect someone is typing
+  socket.on("typing", ({ user, typing }) => {
+    // send message to all clients
+    io.emit("isTyping", { user, typing });
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });

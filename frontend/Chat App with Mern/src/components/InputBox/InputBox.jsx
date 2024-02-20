@@ -17,9 +17,24 @@ const InputBox = ({ name, chatId }) => {
     });
   }, []);
 
+  // detect typing
+  let typingTimer;
+  let typingDelay = 2000;
+  const startTypig = () => {
+    socket.emit("typing", { user: loggedInUser, typing: true });
+  };
+  const stopTypig = () => {
+    socket.emit("typing", { user: loggedInUser, typing: false });
+  };
+
   // get user input message
   const handleChange = (e) => {
     setNewMessage(e.target.value);
+    // typing show to others
+    typingDelay = 2000;
+    clearTimeout(typingTimer);
+    startTypig();
+    typingTimer = setTimeout(stopTypig, typingDelay);
   };
 
   // get emoji input

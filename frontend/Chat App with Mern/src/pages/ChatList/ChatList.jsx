@@ -5,6 +5,8 @@ import InputBox from "../../components/InputBox/InputBox";
 import { useContext, useEffect, useRef, useState } from "react";
 import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const ChatList = () => {
   const [messages, setMessages] = useContext(messageContext);
@@ -14,6 +16,7 @@ const ChatList = () => {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
+  const [isTyping, setIsTyping] = useState({});
 
   const messageContainerRef = useRef(null);
 
@@ -24,6 +27,13 @@ const ChatList = () => {
       });
     }
   }, [messages]);
+
+  useEffect(() => {
+    // identify typing messages
+    socket.on("isTyping", ({ user, typing }) => {
+      setIsTyping({ user, typing });
+    });
+  }, []);
 
   // handle select user and create new chat
   const handleStartConversation = async (user) => {
@@ -209,6 +219,16 @@ const ChatList = () => {
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
                       {selectedUser.name}{" "}
                       {loggedInUser._id === selectedUser._id ? "(You)" : ""}
+                      {isTyping.typing &&
+                      isTyping.user._id != loggedInUser._id ? (
+                        <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
+                          typing...
+                        </p>
+                      ) : (
+                        <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
+                          last seen 10:22 am
+                        </p>
+                      )}
                     </h3>
                   </div>
                 </div>
