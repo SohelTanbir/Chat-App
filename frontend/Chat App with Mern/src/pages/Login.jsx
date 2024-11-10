@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   // submit the form and create account
-  const handleSumit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user.email || !user.password) {
       alert.show("All field are required!");
@@ -36,7 +36,7 @@ const Login = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/v1/users/login", {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/users/login`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(user),
@@ -74,6 +74,7 @@ const Login = () => {
     loggedInUser.email && navigate("/users/chats");
   }, [loggedInUser]);
 
+
   return (
     <div id="auth-page">
       <div className="flex">
@@ -102,7 +103,7 @@ const Login = () => {
             <p className=" font-normal text-black text-center texy-sm py-3">
               Or use your Account
             </p>
-            <form onSubmit={handleSumit}>
+            <form onSubmit={handleSubmit}>
               <input
                 onChange={handleChange}
                 name="email"

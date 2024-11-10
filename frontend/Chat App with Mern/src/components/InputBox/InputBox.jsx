@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { messageContext, userContext } from "../../App";
 import io from "socket.io-client";
-const socket = io("http://localhost:5000");
+const socket = io(`${import.meta.env.VITE_BASE_URL}`);
 
 const InputBox = ({ name, chatId }) => {
   const [newMessage, setNewMessage] = useState("");
@@ -65,7 +65,7 @@ const InputBox = ({ name, chatId }) => {
     };
 
     const respons = await fetch(
-      "http://localhost:5000/api/v1/message/create",
+      `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
       requestOptions
     );
     const { success, userMessages } = await respons.json();

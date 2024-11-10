@@ -21,7 +21,7 @@ function App() {
     // get logged in user
     const getLoggedInUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/users/user", {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/users/user`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const { user } = await res.json();

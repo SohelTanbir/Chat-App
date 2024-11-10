@@ -28,7 +28,7 @@ const SignUp = () => {
   };
 
   // submit the form and create account
-  const handleSumit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user.name || !user.email || !user.password) {
       alert.info("All field are required!");
@@ -36,7 +36,7 @@ const SignUp = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/v1/users/register", {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/users/register`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(user),
@@ -108,7 +108,7 @@ const SignUp = () => {
             <p className=" font-normal text-black text-center texy-sm py-3">
               Or use your email for registration
             </p>
-            <form onSubmit={handleSumit}>
+            <form onSubmit={handleSubmit}>
               <input
                 onChange={handleChange}
                 className="w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none "

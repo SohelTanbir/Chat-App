@@ -6,7 +6,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
 import io from "socket.io-client";
-const socket = io("http://localhost:5000");
+const socket = io(`${import.meta.env.VITE_BASE_URL}`);
 
 const ChatList = () => {
   const [messages, setMessages] = useContext(messageContext);
@@ -17,6 +17,7 @@ const ChatList = () => {
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
   const [isTyping, setIsTyping] = useState({});
+  console.log("messages", messages);
 
   const messageContainerRef = useRef(null);
 
@@ -57,7 +58,7 @@ const ChatList = () => {
     };
 
     const response = await fetch(
-      "http://localhost:5000/api/v1/chat/create",
+      `${import.meta.env.VITE_BASE_URL}/api/v1/chat/create`,
       requestOptions
     );
     const { userChat } = await response.json();
@@ -83,7 +84,7 @@ const ChatList = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/users/all",
+        `${import.meta.env.VITE_BASE_URL}/api/v1/users/all`,
         requestOptions
       );
       const { allUsers, success } = await response.json();
@@ -122,7 +123,7 @@ const ChatList = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/message/find/chat/${chatId}`,
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/find/chat/${chatId}`,
         requestOptions
       );
       const result = await response.json();
@@ -133,7 +134,7 @@ const ChatList = () => {
     }
   };
 
-  // retrive users messages
+  // retrieve users messages
   useEffect(() => {
     getUsersMessages();
   }, [chatId.length]);
