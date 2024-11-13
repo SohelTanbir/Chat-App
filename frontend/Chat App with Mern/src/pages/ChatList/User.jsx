@@ -1,5 +1,4 @@
 const User = ({ user, handleStartConversation, selectedUser }) => {
-  console.log("user", user);
 
   return (
     <div

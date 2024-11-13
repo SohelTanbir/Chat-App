@@ -17,7 +17,7 @@ const ChatList = () => {
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
   const [isTyping, setIsTyping] = useState({});
-  console.log("messages", messages);
+
 
   const messageContainerRef = useRef(null);
 

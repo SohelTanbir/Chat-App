@@ -61,7 +61,7 @@ const Login = () => {
         password: "",
       });
       // redirect to all chats list pages
-      navigate("/");
+      navigate("/users/chats");
     } catch (err) {
       setLoading(false);
       alert.error(err, {
@@ -119,10 +119,10 @@ const Login = () => {
                 type="password"
                 placeholder="Password"
               />
-              <Link to="/password/forgot">
+              <Link to="/password/forgot" className="text-black hover:text-primary hover-animate">
                 <p>Forgot your password?</p>
               </Link>
-              <button className=" font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2">
+              <button className=" font-medium text-white   text-center border  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary hover:bg-transparent hover:text-primary mt-4 hover-animate">
                 Sign in
               </button>
             </form>
