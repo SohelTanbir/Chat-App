@@ -17,7 +17,7 @@ app.use(
   })
 );
 app.use(express.json());
-const connectDatabase = require("./Database/databaseConnecion");
+const connectDatabase = require("./Database/databaseConnection");
 
 // use dotenv configuration
 dotenv.config();
@@ -29,7 +29,7 @@ connectDatabase();
 io.on("connection", (socket) => {
   console.log("New user connected");
 
-  // recieve message from client
+  // receive message from client
   socket.on("sendMessage", ({ user, message }) => {
     // send message to all clients
     io.emit("message", message);

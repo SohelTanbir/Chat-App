@@ -12,3 +12,6 @@
 .selecatedUser {
   @apply bg-[#f3f3f3];
 }
+.hover-animate {
+  @apply transition ease-in duration-200;
+}
