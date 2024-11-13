@@ -226,7 +226,7 @@ const ChatList = () => {
                           typing...
                         </p>
                       ) : (
-                        <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
+                        <p className=" h-4 font-sans font-normal text-xs mt-1 lowercase text-[#808b9f]">
                           last seen 10:22 am
                         </p>
                       )}

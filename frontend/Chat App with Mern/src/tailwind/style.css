@@ -622,6 +622,10 @@ video {
           margin-inline-start: 2rem;
 }
 
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -632,10 +636,6 @@ video {
 
 .mt-5 {
   margin-top: 1.25rem;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
 }
 
 .block {
@@ -1101,7 +1101,7 @@ video {
 
 .selecatedUser {
   --tw-bg-opacity: 1;
-  background-color: rgb(243 243 243 / var(--tw-bg-opacity));
+  background-color: rgb(212 205 205 / var(--tw-bg-opacity));
 }
 
 .hover-animate {
@@ -1129,6 +1129,29 @@ video {
 
 .hover\:bg-transparent:hover {
   background-color: transparent;
+}
+
+.hover\:bg-\[\#f6f3f3\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(246 243 243 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-\[\]:hover {
+  background-color: ;
+}
+
+.hover\:bg-\[d4cdcd\]:hover {
+  background-color: d4cdcd;
+}
+
+.hover\:bg-\[\#d4cdcd\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(212 205 205 / var(--tw-bg-opacity));
+}
+
+.hover\:\!bg-\[\#d4cdcd\]:hover {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(212 205 205 / var(--tw-bg-opacity)) !important;
 }
 
 .hover\:text-primary:hover {

@@ -4,8 +4,8 @@ const User = ({ user, handleStartConversation, selectedUser }) => {
     <div
       onClick={() => handleStartConversation(user)}
       className={`${
-        selectedUser._id == user._id ? "selecatedUser" : ""
-      } user flex items-center justify-between cursor-pointer   hover:bg-[#fbfbfb] py-4 px-5 rounded-sm border-b-[1px] border-[#F6F5F7] select-none`}
+        selectedUser._id == user._id ? "selecatedUser hover:!bg-[#d4cdcd]" : ""
+      } user flex items-center justify-between cursor-pointer   hover:bg-[#f6f3f3] py-4 px-5 rounded-sm border-b-[1px] border-[#F6F5F7] select-none`}
     >
       <div className="flex items-center  ">
         <div className=" w-8 h-8">
