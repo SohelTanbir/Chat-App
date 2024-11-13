@@ -61,7 +61,7 @@ const ChatList = () => {
       `${import.meta.env.VITE_BASE_URL}/api/v1/chat/create`,
       requestOptions
     );
-    const { userChat } = await response.json();
+    const {userChat } = await response.json();
     if (userChat._id) {
       setChatId(userChat._id);
       setMessages(user);
@@ -103,7 +103,7 @@ const ChatList = () => {
     getAllUsers();
   }, []);
 
-  // retrive users messages
+  // retrieve users messages
   const getUsersMessages = async () => {
     var myHeaders = new Headers();
     myHeaders.append(
@@ -118,7 +118,7 @@ const ChatList = () => {
       redirect: "follow",
     };
     setLoadingMessage(true);
-    if (!chatId.length > 0) {
+    if (!chatId) {
       return;
     }
     try {
@@ -137,7 +137,7 @@ const ChatList = () => {
   // retrieve users messages
   useEffect(() => {
     getUsersMessages();
-  }, [chatId.length]);
+  }, [chatId]);
 
   return (
     <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">

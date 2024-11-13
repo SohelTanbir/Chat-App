@@ -3,7 +3,7 @@ const Message = ({ text, sender }) => {
     <div
       className={`${
         sender == "me" ? "my-message" : "friend-messag"
-      } max-w-[250px] md:max-w-[300px] mb-3 p-1 px-2`}
+      } w-max mb-3 py-2 px-4`}
     >
       <p className="m-0 text-white font-normal">{text}</p>
       <small className=" text-[#d9dee0] font-normal text-[12px] text-end block">

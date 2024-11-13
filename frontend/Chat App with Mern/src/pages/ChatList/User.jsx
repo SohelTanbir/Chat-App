@@ -20,7 +20,7 @@ const User = ({ user, handleStartConversation, selectedUser }) => {
             {user.name ? user.name : "User"}
           </h3>
           <p className="font-sans font-normal text-[14px] text-[#989898]   ">
-            Hello everyone
+           This is last message
           </p>
         </div>
       </div>
