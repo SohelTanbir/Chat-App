@@ -259,7 +259,7 @@ const ChatList = () => {
                     messages?.map((message) => (
                       <Message
                         key={message._id}
-                        text={message.message}
+                        message={message}
                         sender={`${
                           message.senderId == loggedInUser._id ? "me" : "friend"
                         }`}
@@ -285,7 +285,7 @@ const ChatList = () => {
           </div>
         ) : (
           <p className="w-full h-screen flex items-center justify-center text-2xl text-[#ddd]">
-            Tap to start Conversasion
+            Tap to start Conversation
           </p>
         )}
       </div>

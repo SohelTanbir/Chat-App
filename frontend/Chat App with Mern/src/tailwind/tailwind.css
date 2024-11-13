@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.friend-messag {
+.friend-message {
   @apply rounded-tr-2xl rounded-bl-3xl bg-[#808b9f] text-black;
 }
 
