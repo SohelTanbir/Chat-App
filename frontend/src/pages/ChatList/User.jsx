@@ -1,4 +1,5 @@
-const User = ({ user, handleStartConversation, selectedUser }) => {
+const User = ({ user, handleStartConversation, selectedUser, onlineUsers }) => {
+  const isOnline = onlineUsers?.includes(user._id);
 
   return (
     <div
@@ -25,6 +26,11 @@ const User = ({ user, handleStartConversation, selectedUser }) => {
         </div>
       </div>
       <div className="text-[#989898] text-sm">
+        {isOnline ? (
+          <span className="inline-flex items-center mr-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+          </span>
+        ) : null}
         <span>10:32 PM</span>
       </div>
     </div>

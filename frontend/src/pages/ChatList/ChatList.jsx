@@ -17,6 +17,8 @@ const ChatList = () => {
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
   const [isTyping, setIsTyping] = useState({});
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const currentUserId = loggedInUser?._id || loggedInUser?.userId;
 
 
   const messageContainerRef = useRef(null);
@@ -34,7 +36,22 @@ const ChatList = () => {
     socket.on("isTyping", ({ user, typing }) => {
       setIsTyping({ user, typing });
     });
+
+    socket.on("online-users", (users) => {
+      setOnlineUsers(users || []);
+    });
+
+    return () => {
+      socket.off("isTyping");
+      socket.off("online-users");
+    };
   }, []);
+
+  useEffect(() => {
+    if (currentUserId) {
+      socket.emit("user-online", currentUserId);
+    }
+  }, [currentUserId]);
 
   // handle select user and create new chat
   const handleStartConversation = async (user) => {
@@ -46,7 +63,7 @@ const ChatList = () => {
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
-      senderId: loggedInUser._id,
+      senderId: currentUserId,
       receiverId: user._id,
     });
 
@@ -61,8 +78,8 @@ const ChatList = () => {
       `${import.meta.env.VITE_BASE_URL}/api/v1/chat/create`,
       requestOptions
     );
-    const {userChat } = await response.json();
-    if (userChat._id) {
+    const { userChat } = await response.json();
+    if (userChat?._id) {
       setChatId(userChat._id);
       setMessages(user);
       setSelectedUser(user);
@@ -190,6 +207,7 @@ const ChatList = () => {
                     key={user._id}
                     selectedUser={selectedUser}
                     handleStartConversation={handleStartConversation}
+                    onlineUsers={onlineUsers}
                   />
                 ))
               ) : (
@@ -219,9 +237,15 @@ const ChatList = () => {
                   <div className="title ms-3">
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
                       {selectedUser.name}{" "}
-                      {loggedInUser._id === selectedUser._id ? "(You)" : ""}
+                      {currentUserId === selectedUser._id ? "(You)" : ""}
+                      {onlineUsers.includes(selectedUser._id) ? (
+                        <span className="ml-2 inline-flex items-center">
+                          <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                          <span className="ml-2 text-xs text-[#808b9f]">online</span>
+                        </span>
+                      ) : null}
                       {isTyping.typing &&
-                      isTyping.user._id != loggedInUser._id ? (
+                      isTyping.user._id != currentUserId ? (
                         <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
                           typing...
                         </p>
@@ -261,7 +285,7 @@ const ChatList = () => {
                         key={message._id}
                         message={message}
                         sender={`${
-                          message.senderId == loggedInUser._id ? "me" : "friend"
+                          message.senderId == currentUserId ? "me" : "friend"
                         }`}
                       />
                     ))

@@ -26,8 +26,20 @@ dotenv.config();
 connectDatabase();
 
 // socket connection start
+const onlineUsers = new Map();
+const socketToUser = new Map();
+
 io.on("connection", (socket) => {
   console.log("New user connected");
+
+  socket.on("user-online", (userId) => {
+    if (!userId) {
+      return;
+    }
+    onlineUsers.set(userId, true);
+    socketToUser.set(socket.id, userId);
+    io.emit("online-users", Array.from(onlineUsers.keys()));
+  });
 
   // receive message from client
   socket.on("sendMessage", ({ user, message }) => {
@@ -42,6 +54,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    const userId = socketToUser.get(socket.id);
+    if (userId) {
+      onlineUsers.delete(userId);
+      socketToUser.delete(socket.id);
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    }
     console.log("User disconnected");
   });
 });

@@ -9,6 +9,7 @@ const InputBox = ({ name, chatId }) => {
   const [messages, setMessages] = useContext(messageContext);
   const [loggedInUser] = useContext(userContext);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const currentUserId = loggedInUser?._id || loggedInUser?.userId;
 
   useEffect(() => {
     // Receive message from server
@@ -54,7 +55,7 @@ const InputBox = ({ name, chatId }) => {
 
     var raw = JSON.stringify({
       chatId,
-      senderId: loggedInUser._id,
+      senderId: currentUserId,
       message: newMessage,
     });
     var requestOptions = {
