@@ -8,7 +8,7 @@ const Message = ({ message, sender }) => {
         sender == "me" ? "my-message" : "friend-message"
       } w-max mb-3 py-2 px-4`}
     >
-      <p className="m-0 text-white font-normal">{'text'}</p>
+      <p className="m-0 text-white font-normal">{message.message || ""}</p>
       <small className=" text-[#d9dee0] font-normal text-[12px] text-end block">
        {time || ''}
       </small>

@@ -17,20 +17,27 @@ function App() {
   const [loggedInUser, setLoggedInUser] = useState([]);
   const [messages, setMessages] = useState([]);
 
+  // add to number make a function
+
   useEffect(() => {
     // get logged in user
     const getLoggedInUser = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/users/user`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/api/v1/users/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
         const { user } = await res.json();
         if (!user) {
           return;
         }
         setLoggedInUser(user[0]);
       } catch (err) {
-       return err;
+        return err;
       }
     };
 
@@ -44,6 +51,8 @@ function App() {
     // you can also just use 'scale'
     transition: transitions.SCALE,
   };
+
+ 
 
   return (
     <>
