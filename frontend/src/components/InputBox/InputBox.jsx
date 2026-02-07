@@ -11,6 +11,7 @@ const InputBox = ({ name, chatId }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
   const [isSending, setIsSending] = useState(false);
+  const textAreaRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -31,6 +32,13 @@ const InputBox = ({ name, chatId }) => {
   // get user input message
   const handleChange = (e) => {
     setNewMessage(e.target.value);
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = `${Math.min(
+        textAreaRef.current.scrollHeight,
+        140,
+      )}px`;
+    }
     // typing show to others
     if (typingTimerRef.current) {
       clearTimeout(typingTimerRef.current);
@@ -88,6 +96,9 @@ const InputBox = ({ name, chatId }) => {
         );
         setShowEmojiPicker(false);
         setNewMessage("");
+        if (textAreaRef.current) {
+          textAreaRef.current.style.height = "auto";
+        }
       }
     } finally {
       setIsSending(false);
@@ -103,19 +114,21 @@ const InputBox = ({ name, chatId }) => {
       )}
       <form
         onSubmit={handleSubmit}
-        className="flex items-center justify-between relative"
+        className="flex items-end justify-between relative"
       >
-        <input
-          type="text"
+        <textarea
+          ref={textAreaRef}
+          rows={1}
           onChange={handleChange}
           onFocus={() => setShowEmojiPicker(false)}
           onBlur={stopTypig}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && e.repeat) {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
+              handleSubmit(e);
             }
           }}
-          className="w-[95%]   p-2 ps-12  rounded-md focus:outline-none"
+          className="w-[95%] p-2 ps-12 rounded-md focus:outline-none resize-none overflow-y-auto max-h-[140px]"
           placeholder={`Message to ${name}`}
           value={newMessage}
           spellCheck={false}

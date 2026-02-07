@@ -667,6 +667,10 @@ video {
   margin-top: 1.25rem;
 }
 
+.mt-auto {
+  margin-top: auto;
+}
+
 .block {
   display: block;
 }
@@ -721,6 +725,14 @@ video {
 
 .h-screen {
   height: 100vh;
+}
+
+.max-h-\[140px\] {
+  max-height: 140px;
+}
+
+.min-h-0 {
+  min-height: 0px;
 }
 
 .w-10 {
@@ -793,6 +805,14 @@ video {
   max-width: 70%;
 }
 
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.shrink-0 {
+  flex-shrink: 0;
+}
+
 @keyframes pulse {
   50% {
     opacity: .5;
@@ -811,6 +831,10 @@ video {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+
+.resize-none {
+  resize: none;
 }
 
 .flex-col {

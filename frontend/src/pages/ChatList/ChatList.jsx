@@ -355,7 +355,7 @@ const ChatList = () => {
 
   return (
     <div className="max-w-[1600px] w-full h-[95vh] mx-auto bg-[#ffffff] mt-5 overflow-hidden">
-      <div className="flex justify-between">
+      <div className="flex justify-between h-full">
         <div className="chats-sidebar max-w-[350px] w-full">
           <div className="chats-header bg-[#009432] p-5">
             <div className="user mb-5 flex items-center justify-between">
@@ -472,7 +472,7 @@ const ChatList = () => {
           </div>
         </div>
         {selectedUser ? (
-          <div className="chats-body  w-full  relative">
+          <div className="chats-body w-full relative flex flex-col h-full min-h-0">
             <div className="w-full  p-5 border-b-[1px]">
               <div className="user flex items-center justify-between">
                 <div className="flex items-center  ">
@@ -541,7 +541,7 @@ const ChatList = () => {
               <>
                 <div
                   ref={messageContainerRef}
-                  className="message-container h-[80vh] overflow-y-auto  px-5 py-4"
+                  className="message-container flex-1 min-h-0 overflow-y-auto px-5 py-4"
                 >
                   {messages?.length > 0 ? (
                     messages?.map((message) => (
@@ -560,10 +560,12 @@ const ChatList = () => {
                   )}
                 </div>
 
-                <InputBox
-                  name={selectedUser ? selectedUser.name : ""}
-                  chatId={chatId}
-                />
+                <div className="shrink-0">
+                  <InputBox
+                    name={selectedUser ? selectedUser.name : ""}
+                    chatId={chatId}
+                  />
+                </div>
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
