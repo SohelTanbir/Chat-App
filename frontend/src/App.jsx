@@ -10,6 +10,8 @@ import { transitions, positions, Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import Home from "./pages/Home/Home";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 export const userContext = createContext();
 export const messageContext = createContext();
 
@@ -63,6 +65,12 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/account/register" element={<SignUp />} />
               <Route exact path="/account/login" element={<Login />} />
+              <Route exact path="/password/forgot" element={<ForgotPassword />} />
+              <Route
+                exact
+                path="/password/reset/:token"
+                element={<ResetPassword />}
+              />
               <Route
                 exact
                 path="/users/chats"
