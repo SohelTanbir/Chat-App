@@ -29,7 +29,7 @@ const ResetPassword = () => {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ password }),
-        }
+        },
       );
       const { success, message } = await res.json();
       setLoading(false);

@@ -54,8 +54,6 @@ function App() {
     transition: transitions.SCALE,
   };
 
- 
-
   return (
     <>
       <userContext.Provider value={[loggedInUser, setLoggedInUser]}>
@@ -65,7 +63,11 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/account/register" element={<SignUp />} />
               <Route exact path="/account/login" element={<Login />} />
-              <Route exact path="/password/forgot" element={<ForgotPassword />} />
+              <Route
+                exact
+                path="/password/forgot"
+                element={<ForgotPassword />}
+              />
               <Route
                 exact
                 path="/password/reset/:token"

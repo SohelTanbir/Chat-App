@@ -200,23 +200,23 @@ const forgotPassword = async (req, res) => {
     const transporter = nodemailer.createTransport(
       process.env.SMTP_SERVICE
         ? {
-            service: process.env.SMTP_SERVICE,
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-            },
-          }
+          service: process.env.SMTP_SERVICE,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        }
         : {
-            host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT),
-            secure: Number(process.env.SMTP_PORT) === 465,
-            auth: process.env.SMTP_USER
-              ? {
-                  user: process.env.SMTP_USER,
-                  pass: process.env.SMTP_PASS,
-                }
-              : undefined,
-          }
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT),
+          secure: Number(process.env.SMTP_PORT) === 465,
+          auth: process.env.SMTP_USER
+            ? {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            }
+            : undefined,
+        }
     );
 
     const mailOptions = {

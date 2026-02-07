@@ -22,7 +22,7 @@ const ForgotPassword = () => {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ email }),
-        }
+        },
       );
       const { success, message, resetToken } = await res.json();
       setLoading(false);
