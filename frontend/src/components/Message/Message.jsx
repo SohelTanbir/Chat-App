@@ -10,8 +10,13 @@ const Message = ({ message, sender }) => {
     >
       <p className="m-0 text-white font-normal">{message.message || ""}</p>
       <small className=" text-[#d9dee0] font-normal text-[12px] text-end block">
-       {time || ''}
+        {time || ""}
       </small>
+      {sender == "me" ? (
+        <small className=" text-[#d9dee0] font-normal text-[11px] text-end block">
+          {message.isSeen ? "seen" : "sent"}
+        </small>
+      ) : null}
     </div>
   );
 };

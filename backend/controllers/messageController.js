@@ -22,10 +22,9 @@ const createMessage = async (req, res) => {
         message: "Message saved Failed!",
       });
     }
-    const messages = await MessageModel.find({ chatId });
     res.status(201).json({
       success: true,
-      userMessages:messages,
+      message: result,
     });
   } catch (err) {
     res.status(500).json({
@@ -66,8 +65,39 @@ const getUsersMessages = async (req, res) => {
   }
 };
 
+// mark messages seen in a chat
+const markMessagesSeen = async (req, res) => {
+  const { chatId } = req.params;
+  const { userId } = req.user || {};
+  if (!chatId || !userId) {
+    return res.status(400).json({
+      success: false,
+      message: "Chat id and user id are required",
+    });
+  }
+
+  try {
+    const result = await MessageModel.updateMany(
+      { chatId, senderId: { $ne: userId }, isSeen: { $ne: true } },
+      { $set: { isSeen: true, seenAt: new Date() } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      updated: result.modifiedCount || 0,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "There was an server error!",
+      error: err.message,
+    });
+  }
+};
+
 // export controller
 module.exports = {
   createMessage,
   getUsersMessages,
+  markMessagesSeen,
 };

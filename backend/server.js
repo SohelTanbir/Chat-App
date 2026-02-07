@@ -28,6 +28,7 @@ connectDatabase();
 // socket connection start
 const onlineUsers = new Map();
 const socketToUser = new Map();
+const lastSeenMap = new Map();
 
 io.on("connection", (socket) => {
   console.log("New user connected");
@@ -38,13 +39,22 @@ io.on("connection", (socket) => {
     }
     onlineUsers.set(userId, true);
     socketToUser.set(socket.id, userId);
-    io.emit("online-users", Array.from(onlineUsers.keys()));
+    lastSeenMap.delete(userId);
+    const onlineList = Array.from(onlineUsers.keys());
+    const lastSeen = Object.fromEntries(lastSeenMap);
+    io.emit("online-users", onlineList);
+    io.emit("presence-update", { onlineUsers: onlineList, lastSeen });
   });
 
   // receive message from client
-  socket.on("sendMessage", ({ user, message }) => {
+  socket.on("sendMessage", ({ chatId, message }) => {
     // send message to all clients
-    io.emit("message", message);
+    io.emit("message", { chatId, message });
+  });
+
+  socket.on("messages-seen", ({ chatId, userId }) => {
+    if (!chatId || !userId) return;
+    io.emit("messages-seen", { chatId, userId });
   });
 
   // detect someone is typing
@@ -58,7 +68,11 @@ io.on("connection", (socket) => {
     if (userId) {
       onlineUsers.delete(userId);
       socketToUser.delete(socket.id);
-      io.emit("online-users", Array.from(onlineUsers.keys()));
+      lastSeenMap.set(userId, Date.now());
+      const onlineList = Array.from(onlineUsers.keys());
+      const lastSeen = Object.fromEntries(lastSeenMap);
+      io.emit("online-users", onlineList);
+      io.emit("presence-update", { onlineUsers: onlineList, lastSeen });
     }
     console.log("User disconnected");
   });

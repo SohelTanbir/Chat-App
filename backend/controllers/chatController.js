@@ -1,4 +1,6 @@
 const ChatModel = require("../models/chatModel");
+const User = require("../models/userModel");
+const MessageModel = require("../models/messageModel");
 
 // create a new chat
 const createChat = async (req, res) => {
@@ -108,4 +110,51 @@ module.exports = {
   createChat,
   findChat,
   deleteChat,
+  getUserChats,
 };
+
+// get user chats list with last message
+async function getUserChats(req, res) {
+  const { userId } = req.params;
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: "User id is required",
+    });
+  }
+
+  try {
+    const chats = await ChatModel.find({ users: { $in: [userId] } }).sort({ updatedAt: -1 });
+
+    const results = await Promise.all(
+      chats.map(async (chat) => {
+        const otherUserId = chat.users.find((id) => id !== userId);
+        const user = otherUserId ? await User.findById(otherUserId).select("-password") : null;
+        const chatId = chat._id.toString();
+        const lastMessage = await MessageModel.findOne({ chatId }).sort({ createdAt: -1 });
+        const unreadCount = await MessageModel.countDocuments({
+          chatId,
+          senderId: { $ne: userId },
+          isSeen: { $ne: true },
+        });
+        return {
+          chatId: chat._id,
+          user,
+          lastMessage,
+          unreadCount,
+        };
+      })
+    );
+
+    return res.status(200).json({
+      success: true,
+      chats: results.filter((item) => item.user),
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "There was a server error",
+      error: err.message,
+    });
+  }
+}

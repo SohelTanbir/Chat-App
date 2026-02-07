@@ -10,12 +10,12 @@ const InputBox = ({ name, chatId }) => {
   const [loggedInUser] = useContext(userContext);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
-    // Receive message from server
-    socket.on("message", (updatedMessages) => {
-      setMessages(updatedMessages);
-    });
+    return () => {
+      socket.off("message");
+    };
   }, []);
 
   // detect typing
@@ -46,17 +46,24 @@ const InputBox = ({ name, chatId }) => {
   // send message
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSending) {
+      return;
+    }
+    if (!chatId || !currentUserId || !newMessage.trim()) {
+      return;
+    }
+    setIsSending(true);
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
-      `Bearer ${localStorage.getItem("token")}`
+      `Bearer ${localStorage.getItem("token")}`,
     );
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
       chatId,
       senderId: currentUserId,
-      message: newMessage,
+      message: newMessage.trim(),
     });
     var requestOptions = {
       method: "POST",
@@ -65,17 +72,23 @@ const InputBox = ({ name, chatId }) => {
       redirect: "follow",
     };
 
-    const respons = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
-      requestOptions
-    );
-    const { success, userMessages } = await respons.json();
-    if (success && userMessages) {
-      // send message to server
-      socket.emit("sendMessage", { user: loggedInUser, message: userMessages });
-      setMessages(userMessages);
-      setShowEmojiPicker(false);
-      setNewMessage("");
+    try {
+      const respons = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
+        requestOptions,
+      );
+      const { success, message } = await respons.json();
+      if (success && message) {
+        // send message to server
+        socket.emit("sendMessage", { chatId, message });
+        setMessages((prev) =>
+          prev?.some((m) => m._id === message._id) ? prev : [...prev, message],
+        );
+        setShowEmojiPicker(false);
+        setNewMessage("");
+      }
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -94,6 +107,11 @@ const InputBox = ({ name, chatId }) => {
           type="text"
           onChange={handleChange}
           onFocus={() => setShowEmojiPicker(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && e.repeat) {
+              e.preventDefault();
+            }
+          }}
           className="w-[95%]   p-2 ps-12  rounded-md focus:outline-none"
           placeholder={`Message to ${name}`}
           value={newMessage}

@@ -6,20 +6,56 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
 import io from "socket.io-client";
+import { convertToBangladeshTime } from "../../../utilities/utilities";
 const socket = io(`${import.meta.env.VITE_BASE_URL}`);
 
 const ChatList = () => {
   const [messages, setMessages] = useContext(messageContext);
   const [loggedInUser] = useContext(userContext);
-  const [allUsers, setAllUsers] = useState([]);
+  const [userChats, setUserChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [selectedUser, setSelectedUser] = useState(false);
   const [chatId, setChatId] = useState("");
   const [isTyping, setIsTyping] = useState({});
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [lastSeenMap, setLastSeenMap] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [unreadCounts, setUnreadCounts] = useState({});
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
-
+  const getChatKey = (id) => (id ? String(id) : "");
+  const getInitials = (name) => {
+    if (!name) {
+      return "?";
+    }
+    return name
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0].toUpperCase())
+      .join("");
+  };
+  const getAvatarColor = (name) => {
+    const colors = [
+      "#2563eb",
+      "#16a34a",
+      "#db2777",
+      "#7c3aed",
+      "#0f766e",
+      "#ea580c",
+      "#475569",
+      "#dc2626",
+    ];
+    if (!name) return colors[0];
+    const sum = name.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    return colors[sum % colors.length];
+  };
+  const formatLastSeen = (timestamp) => {
+    if (!timestamp) return "offline";
+    const { time } = convertToBangladeshTime(timestamp);
+    return `last seen ${time}`;
+  };
 
   const messageContainerRef = useRef(null);
 
@@ -41,11 +77,67 @@ const ChatList = () => {
       setOnlineUsers(users || []);
     });
 
+    socket.on("presence-update", ({ onlineUsers: users, lastSeen }) => {
+      setOnlineUsers(users || []);
+      setLastSeenMap(lastSeen || {});
+    });
+
+    socket.on("message", ({ chatId: incomingChatId, message }) => {
+      if (!incomingChatId || !message) return;
+      const chatKey = getChatKey(incomingChatId);
+
+      setUserChats((prev) => {
+        const updated = prev.map((item) =>
+          getChatKey(item.chatId) === chatKey
+            ? { ...item, lastMessage: message }
+            : item,
+        );
+        const moved = updated.find(
+          (item) => getChatKey(item.chatId) === chatKey,
+        );
+        const rest = updated.filter(
+          (item) => getChatKey(item.chatId) !== chatKey,
+        );
+        return moved ? [moved, ...rest] : updated;
+      });
+
+      if (chatKey === getChatKey(chatId)) {
+        setMessages((prev) =>
+          prev?.some((m) => m._id === message._id) ? prev : [...prev, message],
+        );
+        if (message.senderId !== currentUserId) {
+          markChatSeen(chatKey, true);
+        }
+        return;
+      }
+
+      if (message.senderId !== currentUserId) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [chatKey]: (prev[chatKey] || 0) + 1,
+        }));
+      }
+    });
+
+    socket.on("messages-seen", ({ chatId: seenChatId, userId }) => {
+      if (!seenChatId || !userId) return;
+      if (getChatKey(seenChatId) !== getChatKey(chatId)) return;
+      if (userId === currentUserId) return;
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.senderId === currentUserId ? { ...m, isSeen: true } : m,
+        ),
+      );
+    });
+
     return () => {
       socket.off("isTyping");
       socket.off("online-users");
+      socket.off("presence-update");
+      socket.off("message");
+      socket.off("messages-seen");
     };
-  }, []);
+  }, [chatId, currentUserId]);
 
   useEffect(() => {
     if (currentUserId) {
@@ -53,44 +145,11 @@ const ChatList = () => {
     }
   }, [currentUserId]);
 
-  // handle select user and create new chat
-  const handleStartConversation = async (user) => {
+  const getUserChats = async () => {
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
-      `Bearer ${localStorage.getItem("token")}`
-    );
-    myHeaders.append("Content-Type", "application/json");
-
-    var raw = JSON.stringify({
-      senderId: currentUserId,
-      receiverId: user._id,
-    });
-
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/chat/create`,
-      requestOptions
-    );
-    const { userChat } = await response.json();
-    if (userChat?._id) {
-      setChatId(userChat._id);
-      setMessages(user);
-      setSelectedUser(user);
-    }
-  };
-
-  const getAllUsers = async () => {
-    var myHeaders = new Headers();
-    myHeaders.append(
-      "Authorization",
-      `Bearer ${localStorage.getItem("token")}`
+      `Bearer ${localStorage.getItem("token")}`,
     );
 
     var requestOptions = {
@@ -101,15 +160,20 @@ const ChatList = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/v1/users/all`,
-        requestOptions
+        `${import.meta.env.VITE_BASE_URL}/api/v1/chat/list/${currentUserId}`,
+        requestOptions,
       );
-      const { allUsers, success } = await response.json();
+      const { chats, success } = await response.json();
       if (!success) {
         setLoading(false);
         return;
       }
-      setAllUsers(allUsers);
+      setUserChats(chats || []);
+      const unreadMap = (chats || []).reduce((acc, item) => {
+        acc[getChatKey(item.chatId)] = item.unreadCount || 0;
+        return acc;
+      }, {});
+      setUnreadCounts(unreadMap);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -117,15 +181,63 @@ const ChatList = () => {
   };
 
   useEffect(() => {
-    getAllUsers();
-  }, []);
+    if (currentUserId) {
+      getUserChats();
+    }
+  }, [currentUserId]);
+
+  const markChatSeen = async (targetChatId, emitSocket = false) => {
+    const chatKey = getChatKey(targetChatId);
+    if (!chatKey) return;
+    try {
+      await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/seen/${chatKey}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      if (emitSocket) {
+        socket.emit("messages-seen", {
+          chatId: chatKey,
+          userId: currentUserId,
+        });
+      }
+    } catch (err) {
+      return;
+    }
+  };
+
+  const handleSelectChat = (chatItem) => {
+    const chatKey = getChatKey(chatItem.chatId);
+    setChatId(chatKey);
+    setSelectedUser(chatItem.user);
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [chatKey]: 0,
+    }));
+    markChatSeen(chatKey, true);
+  };
+
+  const filteredChats = userChats.filter((item) => {
+    const user = item.user || {};
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      user.name?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.phone?.toLowerCase().includes(term)
+    );
+  });
 
   // retrieve users messages
   const getUsersMessages = async () => {
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
-      `Bearer ${localStorage.getItem("token")}`
+      `Bearer ${localStorage.getItem("token")}`,
     );
     myHeaders.append("Content-Type", "application/json");
 
@@ -141,7 +253,7 @@ const ChatList = () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_BASE_URL}/api/v1/message/find/chat/${chatId}`,
-        requestOptions
+        requestOptions,
       );
       const result = await response.json();
       setMessages(result.messages);
@@ -163,12 +275,23 @@ const ChatList = () => {
           <div className="chats-header bg-[#009432] p-5">
             <div className="user mb-5 flex items-center justify-between">
               <div className="flex items-center  ">
-                <div className=" w-10 h-10">
-                  <img
-                    className="w-full h-full object-cover  rounded-full"
-                    src="/images/sohelrana.jpg"
-                    alt="user"
-                  />
+                <div
+                  className=" w-10 h-10 rounded-full overflow-hidden flex items-center justify-center"
+                  style={{
+                    backgroundColor: getAvatarColor(loggedInUser?.name),
+                  }}
+                >
+                  {loggedInUser?.photo?.url ? (
+                    <img
+                      className="w-full h-full object-cover  rounded-full"
+                      src={loggedInUser.photo.url}
+                      alt={loggedInUser.name || "user"}
+                    />
+                  ) : (
+                    <span className="text-sm font-semibold text-[#374151]">
+                      {getInitials(loggedInUser?.name)}
+                    </span>
+                  )}
                 </div>
                 <div className="title ms-3">
                   <h3 className="font-sans font-semibold text-xl text-[#d9dee0] leading-[18px]  uppercase  ">
@@ -188,6 +311,8 @@ const ChatList = () => {
                 type="text"
                 className="bg-[#fff] w-full py-[4px] ps-10  rounded-md focus:outline-none"
                 placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
               <span className="text-md text-[#c6c6c6] absolute left-[12px] top-[8px]">
                 <FaSearch />
@@ -200,19 +325,22 @@ const ChatList = () => {
                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
                   <Loader size={40} />
                 </div>
-              ) : allUsers ? (
-                allUsers.map((user) => (
+              ) : filteredChats.length ? (
+                filteredChats.map((item) => (
                   <User
-                    user={user}
-                    key={user._id}
+                    key={item.chatId}
+                    user={item.user}
+                    lastMessage={item.lastMessage}
                     selectedUser={selectedUser}
-                    handleStartConversation={handleStartConversation}
+                    handleStartConversation={() => handleSelectChat(item)}
                     onlineUsers={onlineUsers}
+                    lastSeenAt={lastSeenMap[item.user?._id]}
+                    unreadCount={unreadCounts[getChatKey(item.chatId)] || 0}
                   />
                 ))
               ) : (
                 <h2 className="text-center text-base py-5 text-gray-600">
-                  No users available
+                  No chats available
                 </h2>
               )}
             </div>
@@ -223,16 +351,23 @@ const ChatList = () => {
             <div className="w-full  p-5 border-b-[1px]">
               <div className="user flex items-center justify-between">
                 <div className="flex items-center  ">
-                  <div className=" w-10 h-10">
-                    <img
-                      className="w-full h-full object-cover  rounded-full"
-                      src={`${
-                        selectedUser.photo?.url
-                          ? selectedUser.photo.url
-                          : "/images/user-default.png"
-                      }`}
-                      alt="user"
-                    />
+                  <div
+                    className=" w-10 h-10 rounded-full overflow-hidden flex items-center justify-center"
+                    style={{
+                      backgroundColor: getAvatarColor(selectedUser?.name),
+                    }}
+                  >
+                    {selectedUser?.photo?.url ? (
+                      <img
+                        className="w-full h-full object-cover  rounded-full"
+                        src={selectedUser.photo.url}
+                        alt={selectedUser.name || "user"}
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-[#374151]">
+                        {getInitials(selectedUser?.name)}
+                      </span>
+                    )}
                   </div>
                   <div className="title ms-3">
                     <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
@@ -241,17 +376,18 @@ const ChatList = () => {
                       {onlineUsers.includes(selectedUser._id) ? (
                         <span className="ml-2 inline-flex items-center">
                           <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-                          <span className="ml-2 text-xs text-[#808b9f]">online</span>
+                          <span className="ml-2 text-xs text-[#808b9f]">
+                            online
+                          </span>
                         </span>
                       ) : null}
-                      {isTyping.typing &&
-                      isTyping.user._id != currentUserId ? (
+                      {isTyping.typing && isTyping.user._id != currentUserId ? (
                         <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
                           typing...
                         </p>
-                      ) : (
+                      ) : onlineUsers.includes(selectedUser._id) ? null : (
                         <p className=" h-4 font-sans font-normal text-xs mt-1 lowercase text-[#808b9f]">
-                          last seen 10:22 am
+                          {formatLastSeen(lastSeenMap[selectedUser._id])}
                         </p>
                       )}
                     </h3>
