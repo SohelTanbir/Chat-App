@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -17,6 +18,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const connectDatabase = require("./Database/databaseConnection");
 
 // use dotenv configuration

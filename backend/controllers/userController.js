@@ -153,6 +153,51 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// update user profile photo
+const updateUserPhoto = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "Photo file is required",
+    });
+  }
+
+  try {
+    const baseUrl =
+      process.env.BACKEND_URL || `${req.protocol}://${req.get("host")}`;
+    const fileUrl = `${baseUrl}/uploads/users/${req.file.filename}`;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      {
+        photo: {
+          public_id: req.file.filename,
+          url: fileUrl,
+        },
+      },
+      { new: true, select: "-password" },
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: updatedUser,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "There was a server error",
+      error: err.message,
+    });
+  }
+};
+
 // forgot password - generate reset token
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -306,4 +351,5 @@ module.exports = {
   getAllUsers,
   forgotPassword,
   resetPassword,
+  updateUserPhoto,
 };

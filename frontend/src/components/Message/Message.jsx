@@ -6,9 +6,11 @@ const Message = ({ message, sender }) => {
     <div
       className={`${
         sender == "me" ? "my-message" : "friend-message"
-      } w-max mb-3 py-2 px-4`}
+      } w-fit max-w-[70%] mb-3 py-2 px-4 break-words whitespace-pre-wrap`}
     >
-      <p className="m-0 text-white font-normal">{message.message || ""}</p>
+      <p className="m-0 text-white font-normal break-words whitespace-pre-wrap">
+        {message.message || ""}
+      </p>
       <small className=" text-[#d9dee0] font-normal text-[12px] text-end block">
         {time || ""}
       </small>

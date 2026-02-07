@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { messageContext, userContext } from "../../App";
 import io from "socket.io-client";
@@ -19,8 +19,8 @@ const InputBox = ({ name, chatId }) => {
   }, []);
 
   // detect typing
-  let typingTimer;
-  let typingDelay = 2000;
+  const typingTimerRef = useRef(null);
+  const typingDelay = 1500;
   const startTypig = () => {
     socket.emit("typing", { user: loggedInUser, typing: true });
   };
@@ -32,10 +32,11 @@ const InputBox = ({ name, chatId }) => {
   const handleChange = (e) => {
     setNewMessage(e.target.value);
     // typing show to others
-    typingDelay = 2000;
-    clearTimeout(typingTimer);
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+    }
     startTypig();
-    typingTimer = setTimeout(stopTypig, typingDelay);
+    typingTimerRef.current = setTimeout(stopTypig, typingDelay);
   };
 
   // get emoji input
@@ -79,6 +80,7 @@ const InputBox = ({ name, chatId }) => {
       );
       const { success, message } = await respons.json();
       if (success && message) {
+        stopTypig();
         // send message to server
         socket.emit("sendMessage", { chatId, message });
         setMessages((prev) =>
@@ -107,6 +109,7 @@ const InputBox = ({ name, chatId }) => {
           type="text"
           onChange={handleChange}
           onFocus={() => setShowEmojiPicker(false)}
+          onBlur={stopTypig}
           onKeyDown={(e) => {
             if (e.key === "Enter" && e.repeat) {
               e.preventDefault();

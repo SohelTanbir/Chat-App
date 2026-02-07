@@ -6,8 +6,10 @@ const {
   getAllUsers,
   forgotPassword,
   resetPassword,
+  updateUserPhoto,
 } = require("../controllers/userController");
 const checkLogin = require("../middlewares/checkLogin");
+const upload = require("../middlewares/upload");
 const router = express.Router();
 
 // users routes
@@ -22,6 +24,7 @@ router.get("/password/reset/:token", (req, res) => {
 });
 router.get("/users/user", checkLogin, getLoggedInUser);
 router.get("/users/all", checkLogin, getAllUsers);
+router.put("/users/photo", checkLogin, upload.single("photo"), updateUserPhoto);
 
 // expor routes
 module.exports = router;

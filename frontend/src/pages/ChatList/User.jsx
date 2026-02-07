@@ -40,12 +40,7 @@ const User = ({
   const lastMessageTime = lastMessage?.createdAt
     ? convertToBangladeshTime(lastMessage.createdAt).time
     : "";
-  const lastSeenTime = lastSeenAt
-    ? `last seen ${convertToBangladeshTime(lastSeenAt).time}`
-    : "offline";
   const lastMessageText = lastMessage?.message || "No messages yet";
-
-  console.log("unreadCount", unreadCount);
 
   return (
     <div
@@ -71,11 +66,11 @@ const User = ({
             </span>
           )}
         </div>
-        <div className="title ms-3">
+        <div className="title ms-3 min-w-0">
           <h3 className="font-sans font-semibold text-lg text-[#6d6d6d] leading-[18px]   ">
             {user.name ? user.name : "User"}
           </h3>
-          <p className="font-sans font-normal text-[14px] text-[#989898]   ">
+          <p className="font-sans font-normal text-[14px] text-[#989898] truncate max-w-[180px]">
             {lastMessageText}
           </p>
         </div>

@@ -1,4 +1,10 @@
-import { FaEllipsisV, FaPhoneAlt, FaSearch, FaVideo } from "react-icons/fa";
+import {
+  FaCamera,
+  FaEllipsisV,
+  FaPhoneAlt,
+  FaSearch,
+  FaVideo,
+} from "react-icons/fa";
 import User from "./User";
 import Message from "../../components/Message/Message";
 import InputBox from "../../components/InputBox/InputBox";
@@ -24,6 +30,7 @@ const ChatList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [unreadCounts, setUnreadCounts] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
   const navigate = useNavigate();
   const getChatKey = (id) => (id ? String(id) : "");
@@ -62,6 +69,8 @@ const ChatList = () => {
 
   const messageContainerRef = useRef(null);
   const menuRef = useRef(null);
+  const photoInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -86,7 +95,20 @@ const ChatList = () => {
   useEffect(() => {
     // identify typing messages
     socket.on("isTyping", ({ user, typing }) => {
-      setIsTyping({ user, typing });
+      if (!user) return;
+      if (typing) {
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        setIsTyping({ user, typing: true });
+        return;
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping({ user, typing: false });
+      }, 800);
     });
 
     socket.on("online-users", (users) => {
@@ -152,6 +174,9 @@ const ChatList = () => {
       socket.off("presence-update");
       socket.off("message");
       socket.off("messages-seen");
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   }, [chatId, currentUserId]);
 
@@ -247,6 +272,40 @@ const ChatList = () => {
     navigate("/account/login", { replace: true });
   };
 
+  const handlePhotoPicker = () => {
+    if (photoUploading) return;
+    photoInputRef.current?.click();
+  };
+
+  const handlePhotoChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("photo", file);
+    setPhotoUploading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/users/photo`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: formData,
+        },
+      );
+      const data = await response.json();
+      if (data?.user) {
+        setLoggedInUser(data.user);
+      }
+    } catch (err) {
+      return;
+    } finally {
+      setPhotoUploading(false);
+      event.target.value = "";
+    }
+  };
+
   const filteredChats = userChats.filter((item) => {
     const user = item.user || {};
     const term = searchTerm.trim().toLowerCase();
@@ -301,23 +360,45 @@ const ChatList = () => {
           <div className="chats-header bg-[#009432] p-5">
             <div className="user mb-5 flex items-center justify-between">
               <div className="flex items-center  ">
-                <div
-                  className=" w-10 h-10 rounded-full overflow-hidden flex items-center justify-center"
-                  style={{
-                    backgroundColor: getAvatarColor(loggedInUser?.name),
-                  }}
-                >
-                  {loggedInUser?.photo?.url ? (
-                    <img
-                      className="w-full h-full object-cover  rounded-full"
-                      src={loggedInUser.photo.url}
-                      alt={loggedInUser.name || "user"}
+                <div className="relative group w-10 h-10">
+                  <div
+                    className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center"
+                    style={{
+                      backgroundColor: getAvatarColor(loggedInUser?.name),
+                    }}
+                  >
+                    {loggedInUser?.photo?.url ? (
+                      <img
+                        className="w-full h-full object-cover rounded-full"
+                        style={{ imageRendering: "auto" }}
+                        src={loggedInUser.photo.url}
+                        alt={loggedInUser.name || "user"}
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-[#374151]">
+                        {getInitials(loggedInUser?.name)}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handlePhotoPicker}
+                    className="absolute inset-0 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    aria-label="Upload profile photo"
+                  >
+                    <FaCamera
+                      className={
+                        photoUploading ? "text-sm animate-pulse" : "text-sm"
+                      }
                     />
-                  ) : (
-                    <span className="text-sm font-semibold text-[#374151]">
-                      {getInitials(loggedInUser?.name)}
-                    </span>
-                  )}
+                  </button>
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                  />
                 </div>
                 <div className="title ms-3">
                   <h3 className="font-sans font-semibold text-xl text-[#d9dee0] leading-[18px]  uppercase  ">
@@ -414,7 +495,7 @@ const ChatList = () => {
                     )}
                   </div>
                   <div className="title ms-3">
-                    <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize  ">
+                    <h3 className="font-sans font-semibold text-xl text-black leading-[18px] capitalize">
                       {selectedUser.name}{" "}
                       {currentUserId === selectedUser._id ? "(You)" : ""}
                       {onlineUsers.includes(selectedUser._id) ? (
@@ -425,16 +506,19 @@ const ChatList = () => {
                           </span>
                         </span>
                       ) : null}
-                      {isTyping.typing && isTyping.user._id != currentUserId ? (
-                        <p className=" h-4 font-sans font-normal text-xs lowercase text-[#808b9f]">
+                    </h3>
+                    <div className="h-4">
+                      {isTyping?.typing &&
+                      isTyping?.user?._id === selectedUser?._id ? (
+                        <p className="font-sans font-normal text-xs lowercase text-[#808b9f]">
                           typing...
                         </p>
                       ) : onlineUsers.includes(selectedUser._id) ? null : (
-                        <p className=" h-4 font-sans font-normal text-xs mt-1 lowercase text-[#808b9f]">
+                        <p className="font-sans font-normal text-xs lowercase text-[#808b9f]">
                           {formatLastSeen(lastSeenMap[selectedUser._id])}
                         </p>
                       )}
-                    </h3>
+                    </div>
                   </div>
                 </div>
                 <div className="user-update text-[#009432] cursor-pointer  flex items-center text-xl pr-5">
