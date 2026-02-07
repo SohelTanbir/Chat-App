@@ -1,4 +1,4 @@
-import { FaPen, FaPhoneAlt, FaSearch, FaVideo } from "react-icons/fa";
+import { FaEllipsisV, FaPhoneAlt, FaSearch, FaVideo } from "react-icons/fa";
 import User from "./User";
 import Message from "../../components/Message/Message";
 import InputBox from "../../components/InputBox/InputBox";
@@ -7,11 +7,12 @@ import { messageContext, userContext } from "../../App";
 import Loader from "../../components/Loader/Loader";
 import io from "socket.io-client";
 import { convertToBangladeshTime } from "../../../utilities/utilities";
+import { useNavigate } from "react-router-dom";
 const socket = io(`${import.meta.env.VITE_BASE_URL}`);
 
 const ChatList = () => {
   const [messages, setMessages] = useContext(messageContext);
-  const [loggedInUser] = useContext(userContext);
+  const [loggedInUser, setLoggedInUser] = useContext(userContext);
   const [userChats, setUserChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
@@ -22,7 +23,9 @@ const ChatList = () => {
   const [lastSeenMap, setLastSeenMap] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [menuOpen, setMenuOpen] = useState(false);
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
+  const navigate = useNavigate();
   const getChatKey = (id) => (id ? String(id) : "");
   const getInitials = (name) => {
     if (!name) {
@@ -58,6 +61,7 @@ const ChatList = () => {
   };
 
   const messageContainerRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -66,6 +70,18 @@ const ChatList = () => {
       });
     }
   }, [messages]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!menuRef.current?.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
 
   useEffect(() => {
     // identify typing messages
@@ -221,6 +237,16 @@ const ChatList = () => {
     markChatSeen(chatKey, true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setLoggedInUser([]);
+    setMessages([]);
+    setSelectedUser(false);
+    setChatId("");
+    setMenuOpen(false);
+    navigate("/account/login", { replace: true });
+  };
+
   const filteredChats = userChats.filter((item) => {
     const user = item.user || {};
     const term = searchTerm.trim().toLowerCase();
@@ -302,8 +328,26 @@ const ChatList = () => {
                   </p>
                 </div>
               </div>
-              <div className="user-update text-[#e5e7eb] cursor-pointer hover:text-primary">
-                <FaPen />
+              <div className="user-update relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  className="text-[#e5e7eb] cursor-pointer hover:text-primary"
+                  aria-label="Open menu"
+                >
+                  <FaEllipsisV />
+                </button>
+                {menuOpen ? (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-100 z-20">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
             <form className="relative">
