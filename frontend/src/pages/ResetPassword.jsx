@@ -73,7 +73,7 @@ const ResetPassword = () => {
               Reset Password
             </h2>
             <h2 className=" font-Montserrat font-bold text-3xl mb-5">
-              Set New Password
+              New Password
             </h2>
             <form onSubmit={handleSubmit}>
               <input
@@ -87,7 +87,7 @@ const ResetPassword = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full mb-[20px] bg-[#EEEEEE] py-2 px-4 rounded-md font-normal text-lg text-black outline-none "
                 type="password"
-                placeholder="Confirm New Password"
+                placeholder="Confirm Password"
                 value={confirmPassword}
               />
               <button className=" font-medium text-white   text-center  border-gray-300 rounded-full  uppercase py-2 px-8 bg-primary mt-2">

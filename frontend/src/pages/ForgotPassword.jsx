@@ -31,9 +31,6 @@ const ForgotPassword = () => {
         return;
       }
       alert.success(message || "Reset link generated");
-      if (resetToken) {
-        alert.info(`Dev token: ${resetToken}`);
-      }
       setEmail("");
     } catch (err) {
       setLoading(false);
