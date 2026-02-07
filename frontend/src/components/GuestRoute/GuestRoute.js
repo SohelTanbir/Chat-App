@@ -1,12 +1,12 @@
 import { useContext } from "react";
 
 import { userContext } from "../../App";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const GuestRoute = ({ children }) => {
-  const navigate = useNavigate();
-  const [loggedInUser] = useContext(userContext);
-  return loggedInUser.email ? children : navigate("/sohel/login");
+  const [loggedInUser, , authLoading] = useContext(userContext);
+  if (authLoading) return null;
+  return loggedInUser?.email ? <Navigate to="/users/chats" /> : children;
 };
 
 export default GuestRoute;

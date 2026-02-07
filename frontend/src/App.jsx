@@ -17,6 +17,7 @@ export const messageContext = createContext();
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState([]);
+  const [authLoading, setAuthLoading] = useState(true);
   const [messages, setMessages] = useState([]);
 
   // add to number make a function
@@ -24,22 +25,28 @@ function App() {
   useEffect(() => {
     // get logged in user
     const getLoggedInUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setAuthLoading(false);
+        return;
+      }
       try {
         const res = await fetch(
           `${import.meta.env.VITE_BASE_URL}/api/v1/users/user`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           },
         );
         const { user } = await res.json();
-        if (!user) {
-          return;
+        if (user && user[0]) {
+          setLoggedInUser(user[0]);
         }
-        setLoggedInUser(user[0]);
       } catch (err) {
         return err;
+      } finally {
+        setAuthLoading(false);
       }
     };
 
@@ -56,7 +63,9 @@ function App() {
 
   return (
     <>
-      <userContext.Provider value={[loggedInUser, setLoggedInUser]}>
+      <userContext.Provider
+        value={[loggedInUser, setLoggedInUser, authLoading]}
+      >
         <messageContext.Provider value={[messages, setMessages]}>
           <AlertProvider template={AlertTemplate} {...options}>
             <Routes>
