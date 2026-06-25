@@ -41,21 +41,31 @@ const InputBox = ({ name, chatId }) => {
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem("token")}`);
     myHeaders.append("Content-Type", "application/json");
 
-    const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
-      {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({ chatId, senderId: currentUserId, message: message.trim(), fileUrl, fileName, fileSize, messageType }),
-      }
-    );
-    const { success, message: savedMsg } = await response.json();
-    if (success && savedMsg) {
-      stopTyping();
-      socket.emit("sendMessage", { chatId, message: savedMsg });
-      setMessages((prev) =>
-        prev?.some((m) => m._id === savedMsg._id) ? prev : [...prev, savedMsg],
+    try {
+      const trimmed = message.trim();
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
+        {
+          method: "POST",
+          headers: myHeaders,
+          body: JSON.stringify({ chatId, senderId: currentUserId, message: trimmed, fileUrl, fileName, fileSize, messageType }),
+        }
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const { success, message: savedMsg } = await response.json();
+      if (success && savedMsg) {
+        stopTyping();
+        socket.emit("sendMessage", { chatId, message: savedMsg });
+        setMessages((prev) =>
+          prev?.some((m) => m._id === savedMsg._id) ? prev : [...prev, savedMsg],
+        );
+      }
+    } catch (err) {
+      console.error("Send message error:", err);
     }
   };
 
@@ -74,6 +84,7 @@ const InputBox = ({ name, chatId }) => {
   };
 
   const handleFileChange = async (e) => {
+    if (uploading) return;
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
@@ -101,7 +112,8 @@ const InputBox = ({ name, chatId }) => {
       } else {
         setUploadError(data.message || "Upload failed");
       }
-    } catch {
+    } catch (err) {
+      console.error("File upload error:", err);
       setUploadError("Upload failed. Try again.");
     } finally {
       setUploading(false);
@@ -175,7 +187,7 @@ const InputBox = ({ name, chatId }) => {
           onChange={handleFileChange}
         />
 
-        <button className="text-2xl text-white ms-5" disabled={isSending}>
+        <button type="submit" className="text-2xl text-white ms-5" disabled={isSending}>
           <svg width="30px" height="30px" viewBox="0 0 24 24" fill="#F3F3F3" xmlns="http://www.w3.org/2000/svg">
             <path d="M2.996 12.5l-1.157 8.821 20.95-8.821-20.95-8.821zm16.028-.5H3.939l-.882-6.724zM3.939 13h15.085L3.057 19.724z"/>
             <path fill="none" d="M0 0h24v24H0z"/>
