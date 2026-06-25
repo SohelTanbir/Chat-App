@@ -38,29 +38,40 @@ const createMessage = async (req, res) => {
 // get users messages
 const getUsersMessages = async (req, res) => {
   const { chatId } = req.params;
+  const { before, limit = 30 } = req.query;
+
   if (!chatId) {
     return res.status(400).json({
       success: false,
-      message: "User chat id is required",
+      message: "Chat id is required",
     });
   }
 
   try {
-    const messages = await MessageModel.find({ chatId });
-    if (!messages) {
-      return res.status(404).json({
-        success: false,
-        message: "There was no message found!",
-      });
+    const query = { chatId };
+    if (before) {
+      query.createdAt = { $lt: new Date(before) };
     }
+
+    const pageSize = Math.min(parseInt(limit, 10) || 30, 100);
+
+    const messages = await MessageModel.find(query)
+      .sort({ createdAt: -1 })
+      .limit(pageSize + 1)
+      .lean();
+
+    const hasMore = messages.length > pageSize;
+    const result = messages.slice(0, pageSize).reverse();
+
     res.status(200).json({
       success: true,
-      messages,
+      messages: result,
+      hasMore,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "There was an server error!",
+      message: "There was a server error!",
     });
   }
 };
