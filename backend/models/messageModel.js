@@ -11,7 +11,7 @@ const messageSchema = mongoose.Schema({
     },
     message: {
         type: String,
-        required: true,
+        default: '',
         trim: true,
     },
     isSeen: {
@@ -22,10 +22,35 @@ const messageSchema = mongoose.Schema({
         type: Date,
         default: null,
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    messageType: {
+        type: String,
+        enum: ['text', 'image', 'file'],
+        default: 'text',
+    },
+    fileUrl: {
+        type: String,
+        default: '',
+    },
+    fileName: {
+        type: String,
+        default: '',
+    },
+    fileSize: {
+        type: Number,
+        default: 0,
+    },
     createdAt: {
         type: Date,
-        default: Date.now(),
-        required: true
+        default: Date.now,
+        required: true,
     }
 });
 
