@@ -36,9 +36,7 @@ io.on("connection", (socket) => {
   console.log("New user connected");
 
   socket.on("user-online", (userId) => {
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
     onlineUsers.set(userId, true);
     socketToUser.set(socket.id, userId);
     lastSeenMap.delete(userId);
@@ -48,21 +46,32 @@ io.on("connection", (socket) => {
     io.emit("presence-update", { onlineUsers: onlineList, lastSeen });
   });
 
-  // receive message from client
+  socket.on("joinChat", (chatId) => {
+    if (chatId) socket.join(chatId);
+  });
+
+  socket.on("leaveChat", (chatId) => {
+    if (chatId) socket.leave(chatId);
+  });
+
   socket.on("sendMessage", ({ chatId, message }) => {
-    // send message to all clients
-    io.emit("message", { chatId, message });
+    if (!chatId || !message) return;
+    io.to(chatId).emit("message", { chatId, message });
   });
 
   socket.on("messages-seen", ({ chatId, userId }) => {
     if (!chatId || !userId) return;
-    io.emit("messages-seen", { chatId, userId });
+    io.to(chatId).emit("messages-seen", { chatId, userId });
   });
 
-  // detect someone is typing
-  socket.on("typing", ({ user, typing }) => {
-    // send message to all clients
-    io.emit("isTyping", { user, typing });
+  socket.on("typing", ({ chatId, user, typing }) => {
+    if (!chatId) return;
+    io.to(chatId).emit("isTyping", { user, typing });
+  });
+
+  socket.on("message-deleted", ({ chatId, messageId }) => {
+    if (!chatId || !messageId) return;
+    io.to(chatId).emit("message-deleted", { chatId, messageId });
   });
 
   socket.on("disconnect", () => {
