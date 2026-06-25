@@ -11,6 +11,7 @@ const InputBox = ({ name, chatId }) => {
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
   const [isSending, setIsSending] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [sendError, setSendError] = useState(null);
   const [uploading, setUploading] = useState(false);
   const textAreaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -66,6 +67,7 @@ const InputBox = ({ name, chatId }) => {
       }
     } catch (err) {
       console.error("Send message error:", err);
+      throw err;
     }
   };
 
@@ -75,9 +77,12 @@ const InputBox = ({ name, chatId }) => {
     setIsSending(true);
     try {
       await sendMessage({ message: newMessage.trim() });
+      setSendError(null);
       setShowEmojiPicker(false);
       setNewMessage("");
       if (textAreaRef.current) textAreaRef.current.style.height = "auto";
+    } catch (err) {
+      setSendError("Failed to send. Try again.");
     } finally {
       setIsSending(false);
     }
@@ -124,6 +129,9 @@ const InputBox = ({ name, chatId }) => {
     <div className="message-input w-full bg-[#009432] py-2 px-5">
       {uploadError && (
         <p className="text-red-200 text-xs mb-1">{uploadError}</p>
+      )}
+      {sendError && (
+        <p className="text-red-200 text-xs mb-1">{sendError}</p>
       )}
       {showEmojiPicker && (
         <div className="absolute bottom-[8%] z-10">

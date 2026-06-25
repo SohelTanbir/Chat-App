@@ -334,7 +334,9 @@ const ChatList = () => {
       } else {
         setHasMore(false);
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      setHasMore(false);
+    } finally {
       setLoadingOlder(false);
     }
   };

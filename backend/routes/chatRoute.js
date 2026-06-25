@@ -26,5 +26,5 @@ router.get("/chat/list/:userId", checkLogin, getUserChats);
 router.get("/chat/find/:userId/:friendId", checkLogin, findChat);
 router.delete("/chat/delete/:chatId", checkLogin, deleteChat);
 
-// expor routes
+// export routes
 module.exports = router;
