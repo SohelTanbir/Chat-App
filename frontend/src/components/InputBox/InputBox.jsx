@@ -1,8 +1,7 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { messageContext, userContext } from "../../App";
-import io from "socket.io-client";
-const socket = io(`${import.meta.env.VITE_BASE_URL}`);
+import socket from "../../socket";
 
 const InputBox = ({ name, chatId }) => {
   const [newMessage, setNewMessage] = useState("");
@@ -13,20 +12,14 @@ const InputBox = ({ name, chatId }) => {
   const [isSending, setIsSending] = useState(false);
   const textAreaRef = useRef(null);
 
-  useEffect(() => {
-    return () => {
-      socket.off("message");
-    };
-  }, []);
-
   // detect typing
   const typingTimerRef = useRef(null);
   const typingDelay = 1500;
-  const startTypig = () => {
-    socket.emit("typing", { user: loggedInUser, typing: true });
+  const startTyping = () => {
+    socket.emit("typing", { chatId, user: loggedInUser, typing: true });
   };
-  const stopTypig = () => {
-    socket.emit("typing", { user: loggedInUser, typing: false });
+  const stopTyping = () => {
+    socket.emit("typing", { chatId, user: loggedInUser, typing: false });
   };
 
   // get user input message
@@ -43,13 +36,13 @@ const InputBox = ({ name, chatId }) => {
     if (typingTimerRef.current) {
       clearTimeout(typingTimerRef.current);
     }
-    startTypig();
-    typingTimerRef.current = setTimeout(stopTypig, typingDelay);
+    startTyping();
+    typingTimerRef.current = setTimeout(stopTyping, typingDelay);
   };
 
   // get emoji input
   const getEmoji = (emojiObj) => {
-    setNewMessage(newMessage + emojiObj.emoji);
+    setNewMessage((prev) => prev + emojiObj.emoji);
   };
 
   // send message
@@ -88,7 +81,7 @@ const InputBox = ({ name, chatId }) => {
       );
       const { success, message } = await respons.json();
       if (success && message) {
-        stopTypig();
+        stopTyping();
         // send message to server
         socket.emit("sendMessage", { chatId, message });
         setMessages((prev) =>
@@ -121,7 +114,7 @@ const InputBox = ({ name, chatId }) => {
           rows={1}
           onChange={handleChange}
           onFocus={() => setShowEmojiPicker(false)}
-          onBlur={stopTypig}
+          onBlur={stopTyping}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
