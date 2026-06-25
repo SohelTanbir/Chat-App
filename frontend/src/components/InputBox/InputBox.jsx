@@ -10,105 +10,115 @@ const InputBox = ({ name, chatId }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const currentUserId = loggedInUser?._id || loggedInUser?.userId;
   const [isSending, setIsSending] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const textAreaRef = useRef(null);
-
-  // detect typing
+  const fileInputRef = useRef(null);
   const typingTimerRef = useRef(null);
   const typingDelay = 1500;
-  const startTyping = () => {
-    socket.emit("typing", { chatId, user: loggedInUser, typing: true });
-  };
-  const stopTyping = () => {
-    socket.emit("typing", { chatId, user: loggedInUser, typing: false });
-  };
 
-  // get user input message
+  const startTyping = () => socket.emit("typing", { chatId, user: loggedInUser, typing: true });
+  const stopTyping = () => socket.emit("typing", { chatId, user: loggedInUser, typing: false });
+
   const handleChange = (e) => {
     setNewMessage(e.target.value);
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = `${Math.min(
-        textAreaRef.current.scrollHeight,
-        140,
-      )}px`;
+      textAreaRef.current.style.height = `${Math.min(textAreaRef.current.scrollHeight, 140)}px`;
     }
-    // typing show to others
-    if (typingTimerRef.current) {
-      clearTimeout(typingTimerRef.current);
-    }
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     startTyping();
     typingTimerRef.current = setTimeout(stopTyping, typingDelay);
   };
 
-  // get emoji input
-  const getEmoji = (emojiObj) => {
-    setNewMessage((prev) => prev + emojiObj.emoji);
-  };
+  const getEmoji = (emojiObj) => setNewMessage((prev) => prev + emojiObj.emoji);
 
-  // send message
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isSending) {
-      return;
-    }
-    if (!chatId || !currentUserId || !newMessage.trim()) {
-      return;
-    }
-    setIsSending(true);
-    var myHeaders = new Headers();
-    myHeaders.append(
-      "Authorization",
-      `Bearer ${localStorage.getItem("token")}`,
-    );
+  const sendMessage = async ({ message = "", fileUrl = "", fileName = "", fileSize = 0, messageType = "text" }) => {
+    if (!chatId || !currentUserId) return;
+    if (!message.trim() && !fileUrl) return;
+
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem("token")}`);
     myHeaders.append("Content-Type", "application/json");
 
-    var raw = JSON.stringify({
-      chatId,
-      senderId: currentUserId,
-      message: newMessage.trim(),
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    try {
-      const respons = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
-        requestOptions,
-      );
-      const { success, message } = await respons.json();
-      if (success && message) {
-        stopTyping();
-        // send message to server
-        socket.emit("sendMessage", { chatId, message });
-        setMessages((prev) =>
-          prev?.some((m) => m._id === message._id) ? prev : [...prev, message],
-        );
-        setShowEmojiPicker(false);
-        setNewMessage("");
-        if (textAreaRef.current) {
-          textAreaRef.current.style.height = "auto";
-        }
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/v1/message/create`,
+      {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({ chatId, senderId: currentUserId, message: message.trim(), fileUrl, fileName, fileSize, messageType }),
       }
+    );
+    const { success, message: savedMsg } = await response.json();
+    if (success && savedMsg) {
+      stopTyping();
+      socket.emit("sendMessage", { chatId, message: savedMsg });
+      setMessages((prev) =>
+        prev?.some((m) => m._id === savedMsg._id) ? prev : [...prev, savedMsg],
+      );
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSending || !newMessage.trim()) return;
+    setIsSending(true);
+    try {
+      await sendMessage({ message: newMessage.trim() });
+      setShowEmojiPicker(false);
+      setNewMessage("");
+      if (textAreaRef.current) textAreaRef.current.style.height = "auto";
     } finally {
       setIsSending(false);
     }
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/message/upload`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        await sendMessage({
+          fileUrl: data.fileUrl,
+          fileName: data.fileName,
+          fileSize: data.fileSize,
+          messageType: data.messageType,
+        });
+      } else {
+        setUploadError(data.message || "Upload failed");
+      }
+    } catch {
+      setUploadError("Upload failed. Try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="message-input w-full bg-[#009432] py-2 px-5">
+      {uploadError && (
+        <p className="text-red-200 text-xs mb-1">{uploadError}</p>
+      )}
       {showEmojiPicker && (
         <div className="absolute bottom-[8%] z-10">
           <EmojiPicker onEmojiClick={getEmoji} />
         </div>
       )}
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-end justify-between relative"
-      >
+      <form onSubmit={handleSubmit} className="flex items-end justify-between relative">
         <textarea
           ref={textAreaRef}
           rows={1}
@@ -121,43 +131,54 @@ const InputBox = ({ name, chatId }) => {
               handleSubmit(e);
             }
           }}
-          className="w-[95%] p-2 ps-12 rounded-md focus:outline-none resize-none overflow-y-auto max-h-[140px]"
+          className="w-[95%] p-2 ps-20 rounded-md focus:outline-none resize-none overflow-y-auto max-h-[140px]"
           placeholder={`Message to ${name}`}
           value={newMessage}
           spellCheck={false}
         />
+
+        {/* Emoji button */}
         <div
-          className="emoji  absolute left-[12px] top-[8px] cursor-pointer "
+          className="emoji absolute left-[12px] top-[8px] cursor-pointer"
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
         >
-          <svg
-            viewBox="0 0 24 24"
-            height="24"
-            width="24"
-            preserveAspectRatio="xMidYMid meet"
-            version="1.1"
-            x="0px"
-            y="0px"
-            enableBackground="new 0 0 24 24"
-            xmlSpace="preserve"
-          >
-            <path
-              fill="currentColor"
-              d="M9.153,11.603c0.795,0,1.439-0.879,1.439-1.962S9.948,7.679,9.153,7.679 S7.714,8.558,7.714,9.641S8.358,11.603,9.153,11.603z M5.949,12.965c-0.026-0.307-0.131,5.218,6.063,5.551 c6.066-0.25,6.066-5.551,6.066-5.551C12,14.381,5.949,12.965,5.949,12.965z M17.312,14.073c0,0-0.669,1.959-5.051,1.959 c-3.505,0-5.388-1.164-5.607-1.959C6.654,14.073,12.566,15.128,17.312,14.073z M11.804,1.011c-6.195,0-10.826,5.022-10.826,11.217 s4.826,10.761,11.021,10.761S23.02,18.423,23.02,12.228C23.021,6.033,17.999,1.011,11.804,1.011z M12,21.354 c-5.273,0-9.381-3.886-9.381-9.159s3.942-9.548,9.215-9.548s9.548,4.275,9.548,9.548C21.381,17.467,17.273,21.354,12,21.354z  M15.108,11.603c0.795,0,1.439-0.879,1.439-1.962s-0.644-1.962-1.439-1.962s-1.439,0.879-1.439,1.962S14.313,11.603,15.108,11.603z"
-            ></path>
+          <svg viewBox="0 0 24 24" height="24" width="24" preserveAspectRatio="xMidYMid meet" version="1.1" enableBackground="new 0 0 24 24" xmlSpace="preserve">
+            <path fill="currentColor" d="M9.153,11.603c0.795,0,1.439-0.879,1.439-1.962S9.948,7.679,9.153,7.679 S7.714,8.558,7.714,9.641S8.358,11.603,9.153,11.603z M5.949,12.965c-0.026-0.307-0.131,5.218,6.063,5.551 c6.066-0.25,6.066-5.551,6.066-5.551C12,14.381,5.949,12.965,5.949,12.965z M17.312,14.073c0,0-0.669,1.959-5.051,1.959 c-3.505,0-5.388-1.164-5.607-1.959C6.654,14.073,12.566,15.128,17.312,14.073z M11.804,1.011c-6.195,0-10.826,5.022-10.826,11.217 s4.826,10.761,11.021,10.761S23.02,18.423,23.02,12.228C23.021,6.033,17.999,1.011,11.804,1.011z M12,21.354 c-5.273,0-9.381-3.886-9.381-9.159s3.942-9.548,9.215-9.548s9.548,4.275,9.548,9.548C21.381,17.467,17.273,21.354,12,21.354z M15.108,11.603c0.795,0,1.439-0.879,1.439-1.962s-0.644-1.962-1.439-1.962s-1.439,0.879-1.439,1.962S14.313,11.603,15.108,11.603z"/>
           </svg>
         </div>
-        <button className="text-2xl text-white ms-5">
-          <svg
-            width="30px"
-            height="30px"
-            viewBox="0 0 24 24"
-            fill="#F3F3F3"
-            enableBackground="blue"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M2.996 12.5l-1.157 8.821 20.95-8.821-20.95-8.821zm16.028-.5H3.939l-.882-6.724zM3.939 13h15.085L3.057 19.724z" />
-            <path fill="none" d="M0 0h24v24H0z" />
+
+        {/* File attach button */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="absolute left-[42px] top-[8px] cursor-pointer text-gray-600 hover:text-gray-800 disabled:opacity-50"
+          aria-label="Attach file"
+        >
+          {uploading ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="animate-spin">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" opacity=".3"/>
+              <path d="M12 2v4a8 8 0 0 1 0 16v4a12 12 0 0 0 0-24z"/>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+            </svg>
+          )}
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={handleFileChange}
+        />
+
+        <button className="text-2xl text-white ms-5" disabled={isSending}>
+          <svg width="30px" height="30px" viewBox="0 0 24 24" fill="#F3F3F3" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.996 12.5l-1.157 8.821 20.95-8.821-20.95-8.821zm16.028-.5H3.939l-.882-6.724zM3.939 13h15.085L3.057 19.724z"/>
+            <path fill="none" d="M0 0h24v24H0z"/>
           </svg>
         </button>
       </form>
