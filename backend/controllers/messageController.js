@@ -164,10 +164,43 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+// upload message file via Cloudinary
+const uploadMessageFile = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "File is required",
+    });
+  }
+
+  try {
+    const isImage = req.file.mimetype.startsWith("image/");
+    const fileUrl = req.file.path;
+    const fileName = req.file.originalname || req.file.filename || "file";
+    const fileSize = req.file.size || 0;
+    const messageType = isImage ? "image" : "file";
+
+    return res.status(200).json({
+      success: true,
+      fileUrl,
+      fileName,
+      fileSize,
+      messageType,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "File upload failed",
+      error: err.message,
+    });
+  }
+};
+
 // export controller
 module.exports = {
   createMessage,
   getUsersMessages,
   markMessagesSeen,
   deleteMessage,
+  uploadMessageFile,
 };
