@@ -3,6 +3,7 @@ const {
   createMessage,
   getUsersMessages,
   markMessagesSeen,
+  deleteMessage,
 } = require("../controllers/messageController");
 const checkLogin = require("../middlewares/checkLogin");
 
@@ -12,5 +13,6 @@ const router = express.Router();
 router.post("/message/create", checkLogin, createMessage);
 router.get("/message/find/chat/:chatId", checkLogin, getUsersMessages);
 router.put("/message/seen/:chatId", checkLogin, markMessagesSeen);
+router.delete("/message/:messageId", checkLogin, deleteMessage);
 
 module.exports = router;

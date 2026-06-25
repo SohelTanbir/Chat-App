@@ -106,9 +106,68 @@ const markMessagesSeen = async (req, res) => {
   }
 };
 
+// delete message (soft delete)
+const deleteMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { userId } = req.user;
+
+  if (!messageId) {
+    return res.status(400).json({
+      success: false,
+      message: "Message id is required",
+    });
+  }
+
+  try {
+    const msg = await MessageModel.findById(messageId);
+    if (!msg) {
+      return res.status(404).json({
+        success: false,
+        message: "Message not found",
+      });
+    }
+
+    if (msg.senderId !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own messages",
+      });
+    }
+
+    if (msg.isDeleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Message already deleted",
+      });
+    }
+
+    await MessageModel.findByIdAndUpdate(messageId, {
+      $set: {
+        isDeleted: true,
+        deletedAt: new Date(),
+        message: '',
+        fileUrl: '',
+        fileName: '',
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      chatId: msg.chatId,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "There was a server error!",
+      error: err.message,
+    });
+  }
+};
+
 // export controller
 module.exports = {
   createMessage,
   getUsersMessages,
   markMessagesSeen,
+  deleteMessage,
 };
